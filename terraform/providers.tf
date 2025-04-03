@@ -19,10 +19,10 @@ provider "azurerm" {
       permanently_delete_on_destroy = true
     }
   }
-  subscription_id = 
-  client_id       = 
-  client_secret   = 
-  tenant_id       = 
+  subscription_id = ""
+  client_id       = ""
+  client_secret   = ""
+  tenant_id       = ""
 }
 
 provider "docker" {
