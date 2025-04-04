@@ -1,6 +1,11 @@
 name: Build and Push to ACR
 on:
   push:
+    paths:
+      - './petstoreapp'
+      - './petstoreorderservice'
+      - './petstorepetservice'
+      - './petstoreproductservice'
     branches:
       - 'main'
 jobs:
