@@ -167,7 +167,7 @@ resource containerAppOrderService 'Microsoft.App/containerApps@2024-10-02-previe
             }
             {
               name: 'APPLICATIONINSIGHTS_ROLE_NAME'
-              value: 'petstoreapp'
+              value: 'petstoreorderservice'
             }
           ]
         }
@@ -248,7 +248,7 @@ resource containerAppPetService 'Microsoft.App/containerApps@2024-10-02-preview'
             }
             {
               name: 'APPLICATIONINSIGHTS_ROLE_NAME'
-              value: 'petstoreapp'
+              value: 'petstorepetservice'
             }
           ]
         }
@@ -329,7 +329,7 @@ resource containerAppProductService 'Microsoft.App/containerApps@2024-10-02-prev
             }
             {
               name: 'APPLICATIONINSIGHTS_ROLE_NAME'
-              value: 'petstoreapp'
+              value: 'petstoreproductservice'
             }
           ]
         }
