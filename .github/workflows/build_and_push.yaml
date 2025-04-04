@@ -15,7 +15,7 @@ jobs:
       - name: Docker Login
         uses: docker/login-action@v3
         with:
-          registry: ${{ secrets.ACR_LOGIN_SERVER }}
+          registry: ${{ secrets.ACR_REGISTRY }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
@@ -27,25 +27,25 @@ jobs:
         with:
           context: ./petstoreapp
           push: true
-          tags: "${{ secrets.ACR_LOGIN_SERVER }}/petstoreapp:latest"
+          tags: "${{ secrets.ACR_REGISTRY }}/petstoreapp:latest"
 
       - name: Build and Push Order Service
         uses: docker/build-push-action@v2
         with:
           context: ./petstoreorderservice
           push: true
-          tags: "${{ secrets.ACR_LOGIN_SERVER }}/petstoreorderservice:latest"
+          tags: "${{ secrets.ACR_REGISTRY }}/petstoreorderservice:latest"
 
       - name: Build and Push Pet Service
         uses: docker/build-push-action@v2
         with:
           context: ./petstorepetservice
           push: true
-          tags: "${{ secrets.ACR_LOGIN_SERVER }}/petstorepetservice:latest"
+          tags: "${{ secrets.ACR_REGISTRY }}/petstorepetservice:latest"
 
       - name: Build and Push Product Service
         uses: docker/build-push-action@v2
         with:
           context: ./petstoreproductservice
           push: true
-          tags: "${{ secrets.ACR_LOGIN_SERVER }}/petstoreproductservice:latest"
+          tags: "${{ secrets.ACR_REGISTRY }}/petstoreproductservice:latest"
