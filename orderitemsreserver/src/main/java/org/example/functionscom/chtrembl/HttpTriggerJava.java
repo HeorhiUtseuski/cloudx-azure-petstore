@@ -7,6 +7,7 @@ import org.example.functionscom.chtrembl.model.Order;
 
 public class HttpTriggerJava {
     @FunctionName("OrderHistorySave")
+    @StorageAccount("AzureWebJobsStorage")
     public HttpResponseMessage orderHistory(
             @HttpTrigger(
                     name = "req",
