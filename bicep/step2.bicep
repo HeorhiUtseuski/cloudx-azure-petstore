@@ -1,47 +1,58 @@
-import * as petLib from 'common.bicep'
+import * as petLib from 'modules/common.bicep'
 
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
-  name: petLib.generateResourceName('alaw')
-  location: petLib.location
-  properties:{
-    sku: {
-      name: 'PerGB2018'
-    }
-    retentionInDays: 30
+module logAnalyticsWorkspace 'modules/logAnalyticsWorkspace.bicep' = {
+  name: petLib.resource.logAnalyticsWorkspaceName
+  params: {
+    name: petLib.resource.logAnalyticsWorkspaceName
   }
 }
 
-resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: petLib.generateResourceName('aai')
-  location: petLib.location
-  kind: 'java'
-  properties: {
-    WorkspaceResourceId: logAnalyticsWorkspace.id
-    Application_Type: 'java'
+module applicationInsights 'modules/applicationInsights.bicep' = {
+  name: petLib.resource.applicationInsightsName
+  params: {
+    name: petLib.resource.applicationInsightsName
+    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
   }
 }
 
-resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' = {
-  name: petLib.generateResourceName('acr')
-  location: petLib.location
-  sku: {
-    name: 'Standard'
-  }
-  properties: {
-    adminUserEnabled: true
+module storageAccounts 'modules/storageAccounts.bicep' = {
+  name: petLib.resource.storageAccountsName
+  params: {
+    name: petLib.resource.storageAccountsName
   }
 }
 
-resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-08-02-preview' = {
-  name: petLib.generateResourceName('acae')
-  location: petLib.location
-  properties: {
-    appLogsConfiguration: {
-      destination: 'log-analytics'
-      logAnalyticsConfiguration: {
-        customerId: logAnalyticsWorkspace.properties.customerId
-        sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
-      }
-    }
+module applicationServicePlan 'modules/applicationServicePlan.bicep' = {
+  name: petLib.resource.applicationServicePlanName
+  params: {
+    name: petLib.resource.applicationServicePlanName
+  }
+}
+
+module functionApp 'modules/functionApp.bicep' = {
+  name: petLib.resource.functionAppName
+  params: {
+    name: petLib.resource.functionAppName
+    applicationServicePlanId: applicationServicePlan.outputs.id
+    storageAccountsName: storageAccounts.outputs.name
+    storageAccountsAccessKey: storageAccounts.outputs.accessKey
+    applicationInsightsInstrumentationKey: applicationInsights.outputs.instrumentationKey
+    applicationInsightsConnectionString: applicationInsights.outputs.connectionString
+  }
+}
+
+module containerRegistry 'modules/containerRegistry.bicep' = {
+  name: petLib.resource.containerRegistryName
+  params: {
+    name: petLib.resource.applicationServicePlanName
+  }
+}
+
+module containerAppEnvironment 'modules/containerAppEnvironment.bicep' = {
+  name: petLib.resource.containerAppEnvironmentName
+  params: {
+    name: petLib.resource.containerAppEnvironmentName
+    customerId: logAnalyticsWorkspace.outputs.customerId
+    sharedKey: logAnalyticsWorkspace.outputs.primarySharedKey
   }
 }
