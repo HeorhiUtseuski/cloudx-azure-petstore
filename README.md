@@ -24,11 +24,11 @@
 ## Install steps:
 1. Run script *_./bicep/step1.bicep_*
     ```
-   az deployment sub create --name InitDeploy --location westeurope --template-file ./bicep/step1.bicep --parameters resourceGroupName=petStoreModule6
+   az deployment sub create --name InitDeploy --location eastus --template-file ./bicep/step1.bicep
    ```
 2. Run script *_./bicep/step2.bicep_*
     ```
-    az deployment group create --name ResourcesDeploy1 --resource-group petStoreModule6 --template-file ./bicep/step2.bicep
+    az deployment group create --name ResourcesDeploy1 --resource-group petStoreArgModule6 --template-file ./bicep/step2.bicep
     ```
 3. Create secrets on GitHub:
 - ACR_REGISTRY - Azure Container Registry Login server
