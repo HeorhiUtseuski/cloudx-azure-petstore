@@ -26,10 +26,16 @@ public class HttpTriggerJava {
             final ExecutionContext context) {
         context.getLogger().info("Java HTTP trigger processed a request.");
 
+        int countBefore = source.map(order -> order.getProducts().size()).orElse(0);
+        int countAfter = request.getBody().map(order -> order.getProducts().size()).orElse(0);
+
         if (request.getBody().isPresent()) {
             target.setValue(request.getBody().get());
         }
 
-        return request.createResponseBuilder(HttpStatus.OK).body("Hello, " + sessionId).build();
+        String resultTemplate = "Result for sessionId[%s]: count products before [%d] products after [%d]";
+        return request.createResponseBuilder(HttpStatus.OK).body(resultTemplate.formatted(
+                sessionId, countBefore, countAfter
+        )).build();
     }
 }

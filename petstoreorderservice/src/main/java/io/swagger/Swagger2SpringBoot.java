@@ -40,6 +40,7 @@ public class Swagger2SpringBoot implements CommandLineRunner {
 	}
 
 	public static void main(String[] args) throws Exception {
+		log.info("Adding interceptors");
 		new SpringApplication(Swagger2SpringBoot.class).run(args);
 	}
 

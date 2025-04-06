@@ -5,10 +5,11 @@ param location string = resourceGroup().location
 resource applicationServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
   name: name
   location: location
-  kind: 'functionapp,linux'
+  kind: 'linux'
   sku: {
-    tier: 'Dynamic'
-    name: 'Y1'
+    name: 'EP1'
+    tier: 'ElasticPremium'
+    capacity: 1
   }
   properties: {
     reserved: true

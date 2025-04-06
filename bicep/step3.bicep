@@ -12,6 +12,32 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2024-11-01-pr
   name: petLib.resource.containerRegistryName
 }
 
+module applicationServicePlan 'modules/applicationServicePlanPremium.bicep' = {
+  name: petLib.resource.applicationServicePlanName
+  params: {
+    name: petLib.resource.applicationServicePlanName
+  }
+}
+
+module storageAccounts 'modules/storageAccounts.bicep' = {
+  name: petLib.resource.storageAccountsName
+  params: {
+    name: petLib.resource.storageAccountsName
+  }
+}
+
+module functionApp 'modules/functionAppContainer.bicep' = {
+  name: petLib.resource.functionAppName
+  params: {
+    name: petLib.resource.functionAppName
+    applicationServicePlanId: applicationServicePlan.outputs.id
+    containerRegistryLoginServer: containerRegistry.properties.loginServer
+    applicationName: 'orderitemsreserver'
+    storageAccountsName: storageAccounts.outputs.name
+    storageAccountsAccessKey: storageAccounts.outputs.accessKey
+  }
+}
+
 module containerAppPetStoreProductService 'modules/containerApp.bicep' = {
   name: petLib.resource.containerAppPetStoreProductServiceName
   params: {
@@ -44,7 +70,7 @@ module containerAppPetStoreOrderService 'modules/containerApp.bicep' = {
     applicationInsightsConnectionString: applicationInsights.properties.ConnectionString
     containerAppEnvironmentId: containerAppEnvironment.id
     containerRegistryLoginServer: containerRegistry.properties.loginServer
-    envVariables: union(containerAppPetStoreProductService.outputs.env, [])
+    envVariables: union(containerAppPetStoreProductService.outputs.env, functionApp.outputs.env)
   }
 }
 
@@ -60,6 +86,6 @@ module containerAppPetStoreApp 'modules/containerApp.bicep' = {
       containerAppPetStoreProductService.outputs.env, 
       containerAppPetStorePetService.outputs.env,
       containerAppPetStoreOrderService.outputs.env
-      )
+    )
   }
 }

@@ -30,13 +30,20 @@
     ```
     az deployment group create --name ResourcesDeploy1 --resource-group petStoreArgModule6 --template-file ./bicep/step2.bicep
     ```
-3. Create secrets on GitHub:
+3. Create on GitHub:
+
+Variable:
 - ACR_REGISTRY - Azure Container Registry Login server
+
+Secrets:
 - ACR_USERNAME - Azure Container Registry Admin Login
 - ACR_PASSWORD - Azure Container Registry Admin Password
+
 Make any change in code and push for triggered action
 
 4. Run script *_./bicep/step3.bicep_*
     ```
    az deployment group create --name ResourcesDeploy2 --resource-group petStoreModule6 --template-file ./bicep/step3.bicep
    ```
+   
+Finish

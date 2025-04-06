@@ -2,12 +2,12 @@ name: Build and Push to ACR
 on:
   push:
     paths:
-      - 'petstoreapp/**'
+      - 'orderitemsreserver/**'
     branches:
       - 'main'
 jobs:
   build:
-    name: 'Build and Push to ACR petstoreapp'
+    name: 'Build and Push to ACR orderitemsreserver'
     runs-on: ubuntu-latest
 
     steps:
@@ -30,6 +30,6 @@ jobs:
       - name: Build and Push App
         uses: docker/build-push-action@v6
         with:
-          context: ./petstoreapp
+          context: ./orderitemsreserver
           push: true
-          tags: "${{ vars.ACR_REGISTRY }}/petstoreapp:latest"
+          tags: "${{ vars.ACR_REGISTRY }}/orderitemsreserver:latest"

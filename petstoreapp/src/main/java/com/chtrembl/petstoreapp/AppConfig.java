@@ -29,6 +29,7 @@ public class AppConfig implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		log.info("Adding interceptors");
+		log.info("Adding interceptors");
 	}
 
 	@Bean
