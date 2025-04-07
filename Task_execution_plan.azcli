@@ -1,0 +1,142 @@
+$resourceGroupName="petstorerg1"
+$locationEastUsName="eastus"
+$locationWestEuName="westeurope"
+
+az group create --name ${resourceGroupName} --location ${locationEastUsName}
+
+$randomNumber=Get-Random -Minimum 100 -Maximum 999
+$containerResourceName="petstoreacr1$randomNumber"
+
+az acr create --resource-group ${resourceGroupName} --name ${containerResourceName} --sku Basic --admin-enabled true
+
+$repositoryApp="petstoreapp"
+$repositoryOrderService="petstoreorderservice"
+$repositoryPetService="petstorepetservice"
+$repositoryProductService="petstoreproductservice"
+
+docker build -t ${repositoryApp} ./Module3/petstore/${repositoryApp}/
+docker build -t ${repositoryOrderService} ./Module3/petstore/${repositoryOrderService}/
+docker build -t ${repositoryPetService} ./Module3/petstore/${repositoryPetService}/
+docker build -t ${repositoryProductService} ./Module3/petstore/${repositoryProductService}/
+
+az acr login --name ${containerResourceName}
+
+$repositoryTagLatest="latest"
+$repositoryTag="1.0.1"
+#$repositoryTag=$(docker images --no-trunc --quiet ${containerResourceName}.azurecr.io/${repositoryApp}).SubString(7)
+#$repositoryTag=$(docker images --no-trunc --quiet ${repositoryApp}).SubString(7)
+
+docker tag ${repositoryApp} "${containerResourceName}.azurecr.io/${repositoryApp}:${repositoryTagLatest}"
+docker tag ${repositoryApp} "${containerResourceName}.azurecr.io/${repositoryApp}:${repositoryTag}"
+docker tag ${repositoryOrderService} "${containerResourceName}.azurecr.io/${repositoryOrderService}:${repositoryTagLatest}"
+docker tag ${repositoryOrderService} "${containerResourceName}.azurecr.io/${repositoryOrderService}:${repositoryTag}"
+docker tag ${repositoryPetService} "${containerResourceName}.azurecr.io/${repositoryPetService}:${repositoryTagLatest}"
+docker tag ${repositoryPetService} "${containerResourceName}.azurecr.io/${repositoryPetService}:${repositoryTag}"
+docker tag ${repositoryProductService} "${containerResourceName}.azurecr.io/${repositoryProductService}:${repositoryTagLatest}"
+docker tag ${repositoryProductService} "${containerResourceName}.azurecr.io/${repositoryProductService}:${repositoryTag}"
+
+docker push "${containerResourceName}.azurecr.io/${repositoryApp}:${repositoryTagLatest}"
+docker push "${containerResourceName}.azurecr.io/${repositoryApp}:${repositoryTag}"
+docker push "${containerResourceName}.azurecr.io/${repositoryOrderService}:${repositoryTagLatest}"
+docker push "${containerResourceName}.azurecr.io/${repositoryOrderService}:${repositoryTag}"
+docker push "${containerResourceName}.azurecr.io/${repositoryPetService}:${repositoryTagLatest}"
+docker push "${containerResourceName}.azurecr.io/${repositoryPetService}:${repositoryTag}"
+docker push "${containerResourceName}.azurecr.io/${repositoryProductService}:${repositoryTagLatest}"
+docker push "${containerResourceName}.azurecr.io/${repositoryProductService}:${repositoryTag}"
+
+az acr build --image ${repositoryApp}:${repositoryTagLatest} --registry ${containerResourceName} --file Module3/petstore/${repositoryApp}/Dockerfile ./Module3/petstore/${repositoryApp}/
+az acr build --image ${repositoryApp}:${repositoryTag} --registry ${containerResourceName} --file Module3/petstore/${repositoryApp}/Dockerfile ./Module3/petstore/${repositoryApp}/
+az acr build --image ${repositoryOrderService}:${repositoryTagLatest} --registry ${containerResourceName} --file Module3/petstore/${repositoryOrderService}/Dockerfile ./Module3/petstore/${repositoryOrderService}/
+az acr build --image ${repositoryOrderService}:${repositoryTag} --registry ${containerResourceName} --file Module3/petstore/${repositoryOrderService}/Dockerfile ./Module3/petstore/${repositoryOrderService}/
+az acr build --image ${repositoryPetService}:${repositoryTagLatest} --registry ${containerResourceName} --file Module3/petstore/${repositoryPetService}/Dockerfile ./Module3/petstore/${repositoryPetService}/
+az acr build --image ${repositoryPetService}:${repositoryTag} --registry ${containerResourceName} --file Module3/petstore/${repositoryPetService}/Dockerfile ./Module3/petstore/${repositoryPetService}/
+az acr build --image ${repositoryProductService}:${repositoryTagLatest} --registry ${containerResourceName} --file Module3/petstore/${repositoryProductService}/Dockerfile ./Module3/petstore/${repositoryProductService}/
+az acr build --image ${repositoryProductService}:${repositoryTag} --registry ${containerResourceName} --file Module3/petstore/${repositoryProductService}/Dockerfile ./Module3/petstore/${repositoryProductService}/
+
+$appServicePlanWebEastUsName="asp-web-eastus1"
+$appServicePlanWebWestEuName="asp-web-westeurope1"
+$appServicePlanApiEastUsName="asp-api-eastus1"
+
+az appservice plan create --name ${appServicePlanWebEastUsName} --resource-group ${resourceGroupName} --location ${locationEastUsName} --sku S1 --is-linux
+az appservice plan create --name ${appServicePlanWebWestEuName} --resource-group ${resourceGroupName} --location ${locationWestEuName} --sku S1 --is-linux
+az appservice plan create --name ${appServicePlanApiEastUsName} --resource-group ${resourceGroupName} --location ${locationEastUsName} --sku S1 --is-linux
+
+$webAppWebPetStoreAppUsName="wa-pet-store-us"
+$webAppWebPetStoreAppEuName="wa-pet-store-eu"
+
+$webAppApiPetStoreOrderUsName="wa-api-order-service-us"
+$webAppApiPetStoreServiceUsName="wa-api-pet-service-us"
+$webAppApiPetStoreProductUsName="wa-api-prod-service-us"
+
+$acrAdminUserName=$(az acr credential show --resource-group ${resourceGroupName} --name ${containerResourceName} --query username --output tsv)
+$acrAdminPassword=$(az acr credential show --resource-group ${resourceGroupName} --name ${containerResourceName} --query 'passwords[0].value' --output tsv)
+
+az webapp create --resource-group ${resourceGroupName} --plan ${appServicePlanWebEastUsName} --name ${webAppWebPetStoreAppUsName} --container-image-name "${repositoryApp}:${repositoryTagLatest}" --container-registry-user ${acrAdminUserName} --container-registry-password ${acrAdminPassword} --container-registry-url "https://${containerResourceName}.azurecr.io"
+#az webapp create --resource-group ${resourceGroupName} --plan ${appServicePlanWebEastUsName} --name ${webAppWebPetStoreAppUsName} --deployment-container-image-name "${containerResourceName}.azurecr.io/${repositoryApp}:${repositoryTagLatest}"
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppWebPetStoreAppUsName} --settings WEBSITES_PORT=8080
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppWebPetStoreAppUsName} --settings PETSTOREAPP_SERVER_PORT=8080
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppWebPetStoreAppUsName} --settings PETSTOREORDERSERVICE_URL=https://${webAppApiPetStoreOrderUsName}.azurewebsites.net
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppWebPetStoreAppUsName} --settings PETSTOREPETSERVICE_URL=https://${webAppApiPetStoreServiceUsName}.azurewebsites.net
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppWebPetStoreAppUsName} --settings PETSTOREPRODUCTSERVICE_URL=https://${webAppApiPetStoreProductUsName}.azurewebsites.net
+
+az webapp create --resource-group ${resourceGroupName} --plan ${appServicePlanWebWestEuName} --name ${webAppWebPetStoreAppEuName} --container-image-name "${repositoryApp}:${repositoryTagLatest}" --container-registry-user ${acrAdminUserName} --container-registry-password ${acrAdminPassword} --container-registry-url "https://${containerResourceName}.azurecr.io"
+#az webapp create --resource-group ${resourceGroupName} --plan ${appServicePlanWebWestEuName} --name ${webAppWebPetStoreAppEuName} --deployment-container-image-name "${containerResourceName}.azurecr.io/${repositoryApp}:${repositoryTagLatest}"
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppWebPetStoreAppEuName} --settings WEBSITES_PORT=8080
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppWebPetStoreAppEuName} --settings PETSTOREAPP_SERVER_PORT=8080
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppWebPetStoreAppEuName} --settings PETSTOREORDERSERVICE_URL=https://${webAppApiPetStoreOrderUsName}.azurewebsites.net
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppWebPetStoreAppEuName} --settings PETSTOREPETSERVICE_URL=https://${webAppApiPetStoreServiceUsName}.azurewebsites.net
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppWebPetStoreAppEuName} --settings PETSTOREPRODUCTSERVICE_URL=https://${webAppApiPetStoreProductUsName}.azurewebsites.net
+
+az webapp create --resource-group ${resourceGroupName} --plan ${appServicePlanApiEastUsName} --name ${webAppApiPetStoreOrderUsName} --container-image-name "${repositoryOrderService}:${repositoryTagLatest}" --container-registry-user ${acrAdminUserName} --container-registry-password ${acrAdminPassword} --container-registry-url "https://${containerResourceName}.azurecr.io"
+#az webapp create --resource-group ${resourceGroupName} --plan ${appServicePlanApiEastUsName} --name ${webAppApiPetStoreOrderUsName} --deployment-container-image-name "${containerResourceName}.azurecr.io/${repositoryOrderService}:${repositoryTagLatest}"
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppApiPetStoreOrderUsName} --settings WEBSITES_PORT=8080
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppApiPetStoreOrderUsName} --settings PETSTOREORDERSERVICE_SERVER_PORT=8080
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppApiPetStoreOrderUsName} --settings PETSTOREPRODUCTSERVICE_URL=https://${webAppApiPetStoreProductUsName}.azurewebsites.net
+
+az webapp create --resource-group ${resourceGroupName} --plan ${appServicePlanApiEastUsName} --name ${webAppApiPetStoreServiceUsName} --container-image-name "${repositoryPetService}:${repositoryTagLatest}" --container-registry-user ${acrAdminUserName} --container-registry-password ${acrAdminPassword} --container-registry-url "https://${containerResourceName}.azurecr.io"
+#az webapp create --resource-group ${resourceGroupName} --plan ${appServicePlanApiEastUsName} --name ${webAppApiPetStoreServiceUsName} --deployment-container-image-name "${containerResourceName}.azurecr.io/${repositoryPetService}:${repositoryTagLatest}"
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppApiPetStoreServiceUsName} --settings WEBSITES_PORT=8080
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppApiPetStoreServiceUsName} --settings PETSTOREPETSERVICE_SERVER_PORT=8080
+
+az webapp create --resource-group ${resourceGroupName} --plan ${appServicePlanApiEastUsName} --name ${webAppApiPetStoreProductUsName} --container-image-name "${repositoryProductService}:${repositoryTagLatest}" --container-registry-user ${acrAdminUserName} --container-registry-password ${acrAdminPassword} --container-registry-url "https://${containerResourceName}.azurecr.io"
+#az webapp create --resource-group ${resourceGroupName} --plan ${appServicePlanApiEastUsName} --name ${webAppApiPetStoreProductUsName} --deployment-container-image-name "${containerResourceName}.azurecr.io/${repositoryProductService}:${repositoryTagLatest}"
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppApiPetStoreProductUsName} --settings WEBSITES_PORT=8080
+az webapp config appsettings set --resource-group ${resourceGroupName} --name ${webAppApiPetStoreProductUsName} --settings PETSTOREPRODUCTSERVICE_SERVER_PORT=8080
+
+az webapp restart --resource-group ${resourceGroupName} --name ${webAppWebPetStoreAppUsName}
+az webapp restart --resource-group ${resourceGroupName} --name ${webAppWebPetStoreAppEuName}
+az webapp restart --resource-group ${resourceGroupName} --name ${webAppApiPetStoreOrderUsName}
+az webapp restart --resource-group ${resourceGroupName} --name ${webAppApiPetStoreServiceUsName}
+az webapp restart --resource-group ${resourceGroupName} --name ${webAppApiPetStoreProductUsName}
+
+$autoScaleApiUsName="pet-store-auto-scale-api1"
+
+az monitor autoscale create --resource-group ${resourceGroupName} --resource ${appServicePlanApiEastUsName} --name ${autoScaleApiUsName} --min-count 1 --max-count 5 --count 1 --resource-type Microsoft.Web/serverfarms
+
+az monitor autoscale rule create --resource-group ${resourceGroupName} --autoscale-name ${autoScaleApiUsName} --scale out 1 --condition "CpuPercentage > 75 avg 2m"
+az monitor autoscale rule create --resource-group ${resourceGroupName} --autoscale-name ${autoScaleApiUsName} --scale in 1 --condition "CpuPercentage <= 40 avg 2m"
+
+#k6 run k6_test_script.js
+
+$petStoreEvniromemntDevName="dev"
+$petStoreEvniromemntQaName="qa"
+
+az webapp deployment slot create --name ${webAppWebPetStoreAppUsName} --resource-group ${resourceGroupName} --slot ${petStoreEvniromemntQaName} --configuration-source ${webAppWebPetStoreAppUsName}
+#az webapp deployment slot create --name ${webAppWebPetStoreAppEuName} --resource-group ${resourceGroupName} --slot ${petStoreEvniromemntQaName} --configuration-source ${webAppWebPetStoreAppEuName}
+
+az webapp deployment container config --name ${webAppWebPetStoreAppUsName} --resource-group ${resourceGroupName} --enable-cd true --slot ${petStoreEvniromemntQaName}
+#az webapp deployment container config --name ${webAppWebPetStoreAppEuName} --resource-group ${resourceGroupName} --enable-cd true
+
+az webapp deployment slot swap --name ${webAppWebPetStoreAppUsName} --resource-group ${resourceGroupName} --slot ${petStoreEvniromemntQaName} --action 'swap' --target-slot 'production'
+#az webapp deployment slot swap --name ${webAppWebPetStoreAppEuName} --resource-group ${resourceGroupName} --slot ${petStoreEvniromemntQaName} --action 'swap' --target-slot 'production'
+
+$petStoreTrafficManagerProfileName="pet-store-tmp1"
+$endpointNameEastUs="pet-store-tmp1-${locationEastUsName}"
+$endpointNameWestEu="pet-store-tmp1-${locationWestEuName}"
+
+$webAppIdEastUs=$(az webapp show --name ${webAppWebPetStoreAppUsName} --resource-group ${resourceGroupName} --query id --output tsv)
+$webAppIdWestEu=$(az webapp show --name ${webAppWebPetStoreAppEuName} --resource-group ${resourceGroupName} --query id --output tsv)
+
+az network traffic-manager profile create --name ${petStoreTrafficManagerProfileName} --resource-group ${resourceGroupName} --routing-method 'Priority' --unique-dns-name ${petStoreTrafficManagerProfileName}
+az network traffic-manager endpoint create --name ${endpointNameEastUs} --profile-name ${petStoreTrafficManagerProfileName} --resource-group ${resourceGroupName} --type 'azureEndpoints' --endpoint-status 'Enabled' --target-resource-id ${webAppIdEastUs}
+az network traffic-manager endpoint create --name ${endpointNameWestEu} --profile-name ${petStoreTrafficManagerProfileName} --resource-group ${resourceGroupName} --type 'azureEndpoints' --endpoint-status 'Enabled' --target-resource-id ${webAppIdWestEu}
