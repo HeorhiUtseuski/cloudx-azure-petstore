@@ -61,7 +61,7 @@ public class PetStoreServiceImpl implements PetStoreService {
 				.baseUrl(this.containerEnvironment.getPetStoreProductServiceURL()).build();
 		this.orderServiceWebClient = WebClient.builder().baseUrl(this.containerEnvironment.getPetStoreOrderServiceURL())
 				.build();
-		this.orderItemsReserverWebClient = WebClient.builder().baseUrl(this.containerEnvironment.getPetStoreOrderServiceURL()).build();
+		this.orderItemsReserverWebClient = WebClient.builder().baseUrl(this.containerEnvironment.getPetStoreOrderItemServiceURL()).build();
 	}
 
 	@Override
