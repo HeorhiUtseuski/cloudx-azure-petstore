@@ -12,7 +12,7 @@ public class HttpTriggerJava {
             @HttpTrigger(
                     name = "req",
                     methods = {HttpMethod.GET, HttpMethod.POST},
-                    authLevel = AuthorizationLevel.FUNCTION,
+                    authLevel = AuthorizationLevel.ANONYMOUS,
                     route = "{sessionId}"
             ) HttpRequestMessage<Optional<Order>> request,
             @BindingName("sessionId") String sessionId,

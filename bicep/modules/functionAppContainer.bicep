@@ -35,6 +35,16 @@ resource functionAppAppsettings 'Microsoft.Web/sites/config@2024-04-01' = {
   }
 }
 
+resource acrPullRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(name, 'acrpull')
+  scope: functionApp
+  properties: {
+    principalId: functionApp.identity.principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d') // AcrPull
+    principalType: 'ServicePrincipal'
+  }
+}
+
 output env array = [
   {
     name: '${toUpper(applicationName)}_URL'

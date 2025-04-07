@@ -8,7 +8,7 @@ param customerId string
 param sharedKey string
 
 
-resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-10-02-preview' = {
+resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: name
   location: location
   properties: {

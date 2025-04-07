@@ -3,7 +3,7 @@ import * as petLib from 'common.bicep'
 param name string
 param location string = resourceGroup().location
 
-resource containerRegistry 'Microsoft.ContainerRegistry/registries@2024-11-01-preview' = {
+resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
   name: name
   location: location
   sku: {
@@ -11,6 +11,9 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2024-11-01-pr
   }
   properties: {
     adminUserEnabled: true
+  }
+  identity: {
+    type: 'SystemAssigned'
   }
 }
 

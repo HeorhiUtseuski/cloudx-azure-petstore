@@ -22,9 +22,12 @@ var BASE_ENV = [
   }
 ]
 
-resource containerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
+resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: name
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     environmentId: containerAppEnvironmentId
     configuration: {
@@ -41,11 +44,12 @@ resource containerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
           }
         ]
       }
-      runtime: {
-        java: {
-          enableMetrics: true
+      registries: [
+        {
+          server: containerRegistryLoginServer
+          identity: 'system'
         }
-      }
+      ]
     }
     template: {
       containers: [
@@ -74,6 +78,18 @@ resource containerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
         ]
       }
     }
+  }
+
+  
+}
+
+resource acrPullRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(name, 'acrpull')
+  scope: containerApp
+  properties: {
+    principalId: containerApp.identity.principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d') // AcrPull
+    principalType: 'ServicePrincipal'
   }
 }
 
