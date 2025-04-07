@@ -1,6 +1,0 @@
-{
-  "connectionString": "${APPLICATIONINSIGHTS_CONNECTION_STRING}",
-  "role": {   
-    "name": "azurepetstoreapp"
-  }
-}

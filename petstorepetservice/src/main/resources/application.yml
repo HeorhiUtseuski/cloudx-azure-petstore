@@ -399,7 +399,3 @@ data:
         - id: 2
           name: "small"
       status: "available"
-
-azure:
-  application-insights:
-    instrumentation-key: ${APPLICATIONINSIGHTS_CONNECTION_STRING}

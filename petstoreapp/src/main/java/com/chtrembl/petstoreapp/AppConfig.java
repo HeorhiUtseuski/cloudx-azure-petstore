@@ -2,8 +2,6 @@ package com.chtrembl.petstoreapp;
 
 import com.chtrembl.petstoreapp.security.AADB2COidcLoginConfigurerWrapper;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -24,11 +22,8 @@ import java.util.concurrent.TimeUnit;
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class AppConfig implements WebMvcConfigurer {
 
-	private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
-
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		log.info("Adding interceptors");
 	}
 
 	@Bean

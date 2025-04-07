@@ -29,7 +29,3 @@ management:
   endpoint:
     httptrace:
       enabled: true
-
-azure:
-  application-insights:
-    instrumentation-key: ${APPLICATIONINSIGHTS_CONNECTION_STRING}

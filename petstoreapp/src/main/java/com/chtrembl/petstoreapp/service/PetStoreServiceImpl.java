@@ -28,8 +28,9 @@ import org.springframework.web.reactive.function.client.WebClientException;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,6 @@ public class PetStoreServiceImpl implements PetStoreService {
 	private WebClient petServiceWebClient = null;
 	private WebClient productServiceWebClient = null;
 	private WebClient orderServiceWebClient = null;
-	private WebClient orderItemsReserverWebClient = null;
 
 	public PetStoreServiceImpl(User sessionUser, ContainerEnvironment containerEnvironment, WebRequest webRequest) {
 		this.sessionUser = sessionUser;
@@ -61,7 +61,6 @@ public class PetStoreServiceImpl implements PetStoreService {
 				.baseUrl(this.containerEnvironment.getPetStoreProductServiceURL()).build();
 		this.orderServiceWebClient = WebClient.builder().baseUrl(this.containerEnvironment.getPetStoreOrderServiceURL())
 				.build();
-		this.orderItemsReserverWebClient = WebClient.builder().baseUrl(this.containerEnvironment.getPetStoreOrderItemServiceURL()).build();
 	}
 
 	@Override
@@ -140,14 +139,6 @@ public class PetStoreServiceImpl implements PetStoreService {
 			// world production scenario)
 			this.sessionUser.setProducts(products);
 
-			if (category.contains("Fish")) {
-				this.sessionUser.getTelemetryClient().trackEvent("onFisherman", this.sessionUser.getCustomEventProperties(), null);
-			}
-
-			products.stream().filter(product -> product.getName().equals("Ball")).forEach(product -> {
-				this.sessionUser.getTelemetryClient().trackException(new Exception("Attention! Toy ["+product.getName()+"] for dogs and not for children!"));
-			});
-
 			// filter this specific request per category
 			if (tags.stream().anyMatch(t -> t.getName().equals("large"))) {
 				products = products.stream().filter(product -> category.equals(product.getCategory().getName())
@@ -213,24 +204,6 @@ public class PetStoreServiceImpl implements PetStoreService {
 					.configure(SerializationFeature.FAIL_ON_SELF_REFERENCES, false).writeValueAsString(updatedOrder);
 
 			Consumer<HttpHeaders> consumer = it -> it.addAll(this.webRequest.getHeaders());
-
-			try {
-				String reserv = this.orderItemsReserverWebClient.post().uri("orderstorage/{sessionId}", this.sessionUser.getSessionId())
-						.body(BodyInserters.fromPublisher(Mono.just(orderJSON), String.class))
-						.accept(MediaType.APPLICATION_JSON)
-						.headers(consumer)
-						.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-						.header("Cache-Control", "no-cache")
-						.retrieve()
-						.bodyToMono(String.class).block();
-
-				this.sessionUser.getTelemetryClient()
-						.trackEvent(String.format(
-										"PetStoreOrderItemsReserver responce [%s]", reserv),
-								this.sessionUser.getCustomEventProperties(), null);
-			} catch (Exception e) {
-				this.sessionUser.getTelemetryClient().trackException(e);
-			}
 
 			updatedOrder = this.orderServiceWebClient.post().uri("petstoreorderservice/v2/store/order")
 					.body(BodyInserters.fromPublisher(Mono.just(orderJSON), String.class))

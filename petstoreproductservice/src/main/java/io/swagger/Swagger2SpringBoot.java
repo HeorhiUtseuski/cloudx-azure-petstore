@@ -35,7 +35,6 @@ public class Swagger2SpringBoot implements CommandLineRunner {
 	}
 
 	public static void main(String[] args) throws Exception {
-
 		new SpringApplication(Swagger2SpringBoot.class).run(args);
 	}
 
@@ -46,5 +45,6 @@ public class Swagger2SpringBoot implements CommandLineRunner {
 		public int getExitCode() {
 			return 10;
 		}
+
 	}
 }

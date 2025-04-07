@@ -32,11 +32,6 @@
     <dependencies>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
-            <artifactId>applicationinsights-spring-boot-starter</artifactId>
-            <version>2.6.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.microsoft.azure</groupId>
             <artifactId>applicationinsights-logging-logback</artifactId>
             <version>${applicationinsights.version}</version>
         </dependency>
