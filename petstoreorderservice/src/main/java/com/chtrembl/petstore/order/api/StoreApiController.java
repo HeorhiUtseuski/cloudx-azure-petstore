@@ -55,7 +55,7 @@ public class StoreApiController implements StoreApi {
 		return storeApiCache;
 	}
 
-	@org.springframework.beans.factory.annotation.Autowired
+	@Autowired
 	public StoreApiController(ObjectMapper objectMapper, NativeWebRequest request) {
 		this.objectMapper = objectMapper;
 		this.request = request;

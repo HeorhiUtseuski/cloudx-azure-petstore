@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/cloudx-azure-petstore.iml" filepath="$PROJECT_DIR$/.idea/cloudx-azure-petstore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/petstoreapp/petstoreapp.iml" filepath="$PROJECT_DIR$/petstoreapp/petstoreapp.iml" />
     </modules>
   </component>
 </project>

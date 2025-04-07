@@ -57,7 +57,7 @@ public class ProductApiController implements ProductApi {
 		return dataPreload;
 	}
 
-	@org.springframework.beans.factory.annotation.Autowired
+	@Autowired
 	public ProductApiController(ObjectMapper objectMapper, NativeWebRequest request) {
 		this.objectMapper = objectMapper;
 		this.request = request;

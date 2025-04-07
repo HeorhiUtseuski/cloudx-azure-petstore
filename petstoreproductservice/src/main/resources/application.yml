@@ -153,3 +153,7 @@ data:
         - id: 2
           name: "large"
       status: "available"
+
+azure:
+  application-insights:
+    instrumentation-key: ${APPLICATIONINSIGHTS_CONNECTION_STRING}

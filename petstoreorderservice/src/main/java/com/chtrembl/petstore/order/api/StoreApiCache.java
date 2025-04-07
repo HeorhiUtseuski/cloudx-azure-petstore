@@ -48,7 +48,7 @@ public class StoreApiCache {
 	@Qualifier(value = "cacheManager")
 	private CacheManager cacheManager;
 
-	@org.springframework.beans.factory.annotation.Autowired
+	@Autowired
 	public StoreApiCache(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}

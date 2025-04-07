@@ -56,7 +56,7 @@ public class PetApiController implements PetApi {
 		return dataPreload;
 	}
 
-	@org.springframework.beans.factory.annotation.Autowired
+	@Autowired
 	public PetApiController(ObjectMapper objectMapper, NativeWebRequest request) {
 		this.objectMapper = objectMapper;
 		this.request = request;
