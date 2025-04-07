@@ -1,0 +1,95 @@
+###############
+###SUBTASK 2###
+###############
+firstResourceGroup="permanent_rg"
+firstLocation="eastus"
+secondResourceGroup="temporary_rg"
+secondLocation="westeurope"
+
+az group create --name ${firstResourceGroup} --location ${firstLocation}
+az group create --name ${secondResourceGroup} --location ${secondLocation}
+
+az group list --output json
+az group list --output table
+
+az group show --resource-group ${firstResourceGroup} --output json
+
+az group list --query "[?location=='${firstLocation}'].{Name:name, Location:location}" --output table
+
+firstPermanentResourceGroup=$(az group list --query "[?name=='${firstResourceGroup}'].id" --output tsv | tr -d '\r')
+echo ${firstPermanentResourceGroup}
+
+az group delete --resource-group ${firstResourceGroup} --yes
+az group delete --resource-group ${secondResourceGroup} --yes
+
+az group list --output table
+
+
+###############
+###SUBTASK 3###
+###############
+randomNumber=$(printf "%03d" $((RANDOM % 1000)))
+echo $randomNumber
+containerRegistryName="container${randomNumber}"
+echo $containerRegistryName
+
+az acr create --resource-group ${firstResourceGroup} --name ${containerRegistryName} --sku Basic --admin-enabled true
+
+
+###############
+###SUBTASK 5###
+###############
+az resource list --output table
+
+### Create git repository
+
+az acr credential show --name ${containerRegistryName} --output yaml
+
+az acr repository list --name ${containerRegistryName} --output table
+
+repositoryName=$(az acr repository list --name ${containerRegistryName}  --query "[0]" --output tsv | tr -d '\r')
+echo ${repositoryName}
+
+az acr repository show-tags --name ${containerRegistryName} --repository ${repositoryName} --output table
+
+### Update git repository
+
+az acr repository show-tags --name ${containerRegistryName} --repository ${repositoryName} --orderby time_desc --output table
+
+oldestDigest=$(az acr manifest list-metadata --name ${repositoryName} --registry ${containerRegistryName} --query "[-1].digest" --orderby time_desc --output tsv | tr -d '\r')
+echo ${oldestDigest}
+
+az acr repository delete --name ${containerRegistryName} --image ${repositoryName}@${oldestDigest} --yes
+
+az acr repository show-tags --name ${containerRegistryName} --repository ${repositoryName} --orderby time_desc --output table
+
+###############
+###SUBTASK 6###
+###############
+
+temporaryResourceGroup="temporary_rg"
+temporaryLocation="eastus"
+
+az group create --name ${temporaryResourceGroup} --location ${temporaryLocation}
+
+az group list --output table
+
+randomPlanNumber=$(printf "%03d" $((RANDOM % 1000)))
+echo $randomPlanNumber
+secondAppServicePlanName=appservice${randomPlanNumber}
+echo $secondAppServicePlanName
+
+az appservice plan create --name ${secondAppServicePlanName} --resource-group ${temporaryResourceGroup} --location ${temporaryLocation} --sku B1 --is-linux
+
+randomWebAppNumber=$(printf "%03d" $((RANDOM % 1000)))
+echo $randomWebAppNumber
+secondAppAppName=webapp${randomWebAppNumber}
+echo $secondAppAppName
+
+actualTag=$(az acr repository show-tags --name ${containerRegistryName} --repository ${repositoryName} --orderby time_desc --query "[-1]" --output tsv | tr -d '\r')
+echo $actualTag
+
+az webapp create --resource-group ${temporaryResourceGroup} --plan ${secondAppServicePlanName} --name ${secondAppAppName} --deployment-container-image-name ${containerRegistryName}.azurecr.io/${repositoryName}:${actualTag}
+
+az group delete --name ${temporaryResourceGroup} --yes --no-wait
+az group delete --name ${firstResourceGroup} --yes --no-wait
