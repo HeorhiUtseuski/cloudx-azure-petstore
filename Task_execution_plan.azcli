@@ -1,0 +1,189 @@
+####################################################################################
+############################## az_init_variables ###################################
+####################################################################################
+$randomId=Get-Random -Minimum 100 -Maximum 999
+#$randomId="769"
+
+$resourceGroupName="ps-rg-${randomId}"
+$locationEastUsName="eastus"
+$locationWestEuName="westeurope"
+
+$containerRegistryName="pscr${randomId}"
+$sku="Basic"
+
+$petProjectAppName="petstoreapp"
+$petProjectOrderServiceName="petstoreorderservice"
+$petProjectPetServiceName="petstorepetservice"
+$petProjectProductServiceName="petstoreproductservice"
+
+$petProjectVersion="1.0.1"
+$petProjectVersionLatest="latest"
+
+$containerAppEnvName="ps-cae-${randomId}"
+$containerAppAppName="${petProjectAppName}-ca-${randomId}"
+$containerAppOrderServiceName="${petProjectOrderServiceName}-ca-${randomId}"
+$containerAppPetServiceName="${petProjectPetServiceName}-ca-${randomId}"
+$containerAppProductServiceName="${petProjectProductServiceName}-ca-${randomId}"
+
+$containerAppName="${petProjectAppName}-c-${randomId}"
+$containerOrderServiceName="${petProjectOrderServiceName}-c-${randomId}"
+$containerPetServiceName="${petProjectPetServiceName}-c-${randomId}"
+$containerProductServiceName="${petProjectProductServiceName}-c-${randomId}"
+
+####################################################################################
+############################## az_login ############################################
+####################################################################################
+#az login
+
+####################################################################################
+############################## az_resource_group_create ############################
+####################################################################################
+az group create --resource-group "${resourceGroupName}" --location "${locationEastUsName}" --output table
+
+####################################################################################
+############################## az_container_registry_create ########################
+####################################################################################
+az acr create --name "${containerRegistryName}" --resource-group "${resourceGroupName}" --sku "${sku}" --admin-enabled true --output table
+
+####################################################################################
+############################## az_container_registry_get_credentials ###############
+####################################################################################
+$containerRegistryUserName=$(az acr credential show --resource-group ${resourceGroupName} --name ${containerRegistryName} --query username --output tsv)
+$containerRegistryPassword=$(az acr credential show --resource-group ${resourceGroupName} --name ${containerRegistryName} --query 'passwords[0].value' --output tsv)
+
+####################################################################################
+############################## az_container_registry_login #########################
+####################################################################################
+az acr login --name "${containerRegistryName}"
+
+####################################################################################
+############################## docker_build ########################################
+####################################################################################
+docker build -t "${petProjectAppName}" "./petstore_v1/${petProjectAppName}/"
+docker build -t "${petProjectOrderServiceName}" "./petstore_v1/${petProjectOrderServiceName}/"
+docker build -t "${petProjectPetServiceName}" "./petstore_v1/${petProjectPetServiceName}/"
+docker build -t "${petProjectProductServiceName}" "./petstore_v1/${petProjectProductServiceName}/"
+
+####################################################################################
+############################## docker_tag ##########################################
+####################################################################################
+docker tag "${petProjectAppName}" "${containerRegistryName}.azurecr.io/${petProjectAppName}:${petProjectVersionLatest}"
+docker tag "${petProjectAppName}" "${containerRegistryName}.azurecr.io/${petProjectAppName}:${petProjectVersion}"
+docker tag "${petProjectOrderServiceName}" "${containerRegistryName}.azurecr.io/${petProjectOrderServiceName}:${petProjectVersionLatest}"
+docker tag "${petProjectOrderServiceName}" "${containerRegistryName}.azurecr.io/${petProjectOrderServiceName}:${petProjectVersion}"
+docker tag "${petProjectPetServiceName}" "${containerRegistryName}.azurecr.io/${petProjectPetServiceName}:${petProjectVersionLatest}"
+docker tag "${petProjectPetServiceName}" "${containerRegistryName}.azurecr.io/${petProjectPetServiceName}:${petProjectVersion}"
+docker tag "${petProjectProductServiceName}" "${containerRegistryName}.azurecr.io/${petProjectProductServiceName}:${petProjectVersionLatest}"
+docker tag "${petProjectProductServiceName}" "${containerRegistryName}.azurecr.io/${petProjectProductServiceName}:${petProjectVersion}"
+
+####################################################################################
+############################## docker_push #########################################
+####################################################################################
+docker push "${containerRegistryName}.azurecr.io/${petProjectAppName}:${petProjectVersionLatest}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectAppName}:${petProjectVersion}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectOrderServiceName}:${petProjectVersionLatest}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectOrderServiceName}:${petProjectVersion}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectPetServiceName}:${petProjectVersionLatest}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectPetServiceName}:${petProjectVersion}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectProductServiceName}:${petProjectVersionLatest}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectProductServiceName}:${petProjectVersion}"
+
+####################################################################################
+############################## az_create_container_app_env #########################
+####################################################################################
+az containerapp env create --name "${containerAppEnvName}" --resource-group "${resourceGroupName}" --location "${locationEastUsName}" --enable-workload-profiles false --output table
+
+####################################################################################
+############################## az_create_container_app #############################
+####################################################################################
+az containerapp create --name "${containerAppAppName}" --resource-group "${resourceGroupName}" --environment "${containerAppEnvName}" --container-name "${containerAppName}" --image "${containerRegistryName}.azurecr.io/${petProjectAppName}:${petProjectVersion}" --registry-server "${containerRegistryName}.azurecr.io" --registry-username "${containerRegistryUserName}" --registry-password "${containerRegistryPassword}" --cpu 0.25 --memory 0.5Gi --ingress external --transport auto --allow-insecure true --target-port 8080 --output table
+az containerapp create --name "${containerAppOrderServiceName}" --resource-group "${resourceGroupName}" --environment "${containerAppEnvName}" --container-name "${containerOrderServiceName}" --image "${containerRegistryName}.azurecr.io/${petProjectOrderServiceName}:${petProjectVersion}" --registry-server "${containerRegistryName}.azurecr.io" --registry-username "${containerRegistryUserName}" --registry-password "${containerRegistryPassword}" --cpu 0.25 --memory 0.5Gi --ingress external --transport auto --allow-insecure true --target-port 8080 --output table
+az containerapp create --name "${containerAppPetServiceName}" --resource-group "${resourceGroupName}" --environment "${containerAppEnvName}" --container-name "${containerPetServiceName}" --image "${containerRegistryName}.azurecr.io/${petProjectPetServiceName}:${petProjectVersion}" --registry-server "${containerRegistryName}.azurecr.io" --registry-username "${containerRegistryUserName}" --registry-password "${containerRegistryPassword}" --cpu 0.25 --memory 0.5Gi --ingress external --transport auto --allow-insecure true --target-port 8080 --output table
+az containerapp create --name "${containerAppProductServiceName}" --resource-group "${resourceGroupName}" --environment "${containerAppEnvName}" --container-name "${containerProductServiceName}" --image "${containerRegistryName}.azurecr.io/${petProjectProductServiceName}:${petProjectVersion}" --registry-server "${containerRegistryName}.azurecr.io" --registry-username "${containerRegistryUserName}" --registry-password "${containerRegistryPassword}" --cpu 0.25 --memory 0.5Gi --ingress external --transport auto --allow-insecure true --target-port 8080 --output table
+
+$hostAppName="$(az containerapp show --name "${containerAppAppName}" --resource-group "${resourceGroupName}" --query properties.configuration.ingress.fqdn --output tsv)"
+$hostOrderServiceName="$(az containerapp show --name "${containerAppOrderServiceName}" --resource-group "${resourceGroupName}" --query properties.configuration.ingress.fqdn --output tsv)"
+$hostPetServiceName="$(az containerapp show --name "${containerAppPetServiceName}" --resource-group "${resourceGroupName}" --query properties.configuration.ingress.fqdn --output tsv)"
+$hostProductServiceName="$(az containerapp show --name "${containerAppProductServiceName}" --resource-group "${resourceGroupName}" --query properties.configuration.ingress.fqdn --output tsv)"
+
+$revisionV1="v1"
+$containerWebPortName="WEBSITES_PORT"
+$containerWebPortValue="8080"
+$containerAppWebPortName="PETSTOREAPP_SERVER_PORT"
+$containerAppWebPortValue="8080"
+$containerOrderServiceWebPortName="PETSTOREORDERSERVICE_SERVER_PORT"
+$containerOrderServiceWebPortValue="8080"
+$containerPetServiceWebPortName="PETSTOREPETSERVICE_SERVER_PORT"
+$containerPetServiceWebPortValue="8080"
+$containerProductServiceWebPortName="PETSTOREPRODUCTSERVICE_SERVER_PORT"
+$containerProductServiceWebPortValue="8080"
+$containerAppUrlName="PETSTOREAPP_URL"
+$containerAppUrlValue="https://${hostAppName}"
+$containerOrderServiceUrlName="PETSTOREORDERSERVICE_URL"
+$containerOrderServiceUrlValue="https://${hostOrderServiceName}"
+$containerPetServiceUrlName="PETSTOREPETSERVICE_URL"
+$containerPetServiceUrlValue="https://${hostPetServiceName}"
+$containerProductServiceUrlName="PETSTOREPRODUCTSERVICE_URL"
+$containerProductServiceUrlValue="https://${hostProductServiceName}"
+
+az containerapp revision copy --name "${containerAppAppName}" --resource-group "${resourceGroupName}" --container-name "${containerAppName}" --revision-suffix "${revisionV1}" --image "${containerRegistryName}.azurecr.io/${petProjectAppName}:${petProjectVersion}" --set-env-vars ${containerAppWebPortName}=${containerAppWebPortValue} ${containerOrderServiceUrlName}=${containerOrderServiceUrlValue} ${containerPetServiceUrlName}=${containerPetServiceUrlValue} ${containerProductServiceUrlName}=${containerProductServiceUrlValue} --output table
+az containerapp revision copy --name "${containerAppOrderServiceName}" --resource-group "${resourceGroupName}" --container-name "${containerOrderServiceName}" --revision-suffix "${revisionV1}" --image "${containerRegistryName}.azurecr.io/${petProjectOrderServiceName}:${petProjectVersion}" --set-env-vars ${containerOrderServiceWebPortName}=${containerOrderServiceWebPortValue} ${containerProductServiceUrlName}=${containerProductServiceUrlValue} --output table
+az containerapp revision copy --name "${containerAppPetServiceName}" --resource-group "${resourceGroupName}" --container-name "${containerPetServiceName}" --revision-suffix "${revisionV1}" --image "${containerRegistryName}.azurecr.io/${petProjectPetServiceName}:${petProjectVersion}" --set-env-vars ${containerPetServiceWebPortName}=${containerPetServiceWebPortValue} --output table
+az containerapp revision copy --name "${containerAppProductServiceName}" --resource-group "${resourceGroupName}" --container-name "${containerProductServiceName}" --revision-suffix "${revisionV1}" --image "${containerRegistryName}.azurecr.io/${petProjectProductServiceName}:${petProjectVersion}" --set-env-vars ${containerProductServiceWebPortName}=${containerProductServiceWebPortValue} --output table
+
+$scaleRuleAppName="sr${petProjectAppName}${randomId}"
+$scaleRuleOrderServiceName="sr${petProjectOrderServiceName}${randomId}"
+$scaleRulePetServiceName="sr${petProjectPetServiceName}${randomId}"
+$scaleRuleProductServiceName="sr${petProjectProductServiceName}${randomId}"
+
+az containerapp update --name "${containerAppAppName}" --resource-group "${resourceGroupName}" --container-name "${containerAppName}" --scale-rule-name "${scaleRuleAppName}" --min-replicas "1" --max-replicas "3" --scale-rule-type http --scale-rule-http-concurrency 2 --output table
+az containerapp update --name "${containerAppOrderServiceName}" --resource-group "${resourceGroupName}" --container-name "${containerOrderServiceName}" --scale-rule-name "${scaleRuleOrderServiceName}" --min-replicas "1" --max-replicas "3" --scale-rule-type http --scale-rule-http-concurrency 2 --output table
+az containerapp update --name "${containerAppPetServiceName}" --resource-group "${resourceGroupName}" --container-name "${containerPetServiceName}" --scale-rule-name "${scaleRulePetServiceName}" --min-replicas "1" --max-replicas "3" --scale-rule-type http --scale-rule-http-concurrency 2 --output table
+az containerapp update --name "${containerAppProductServiceName}" --resource-group "${resourceGroupName}" --container-name "${containerProductServiceName}" --scale-rule-name "${scaleRuleProductServiceName}" --min-replicas "1" --max-replicas "3" --scale-rule-type http --scale-rule-http-concurrency 2 --output table
+
+
+#k6 run -e ORDER_SERVICE_HOST=${hostOrderServiceName} -e PET_SERVICE_HOST=${hostPetServiceName} -e PRODUCT_SERVICE_HOST=${hostProductServiceName} k6_test_script.js
+
+az containerapp update --name "${containerAppAppName}" --resource-group "${resourceGroupName}" --container-name "${containerAppName}" --revisions-mode "multiple" --output table
+
+$petProjectVersion="1.0.2"
+$revisionV2="v2"
+
+####################################################################################
+############################## docker_build ########################################
+####################################################################################
+docker build -t "${petProjectAppName}" "./petstore_v2/${petProjectAppName}/"
+docker build -t "${petProjectOrderServiceName}" "./petstore_v2/${petProjectOrderServiceName}/"
+docker build -t "${petProjectPetServiceName}" "./petstore_v2/${petProjectPetServiceName}/"
+docker build -t "${petProjectProductServiceName}" "./petstore_v2/${petProjectProductServiceName}/"
+
+####################################################################################
+############################## docker_tag ##########################################
+####################################################################################
+docker tag "${petProjectAppName}" "${containerRegistryName}.azurecr.io/${petProjectAppName}:${petProjectVersionLatest}"
+docker tag "${petProjectAppName}" "${containerRegistryName}.azurecr.io/${petProjectAppName}:${petProjectVersion}"
+docker tag "${petProjectOrderServiceName}" "${containerRegistryName}.azurecr.io/${petProjectOrderServiceName}:${petProjectVersionLatest}"
+docker tag "${petProjectOrderServiceName}" "${containerRegistryName}.azurecr.io/${petProjectOrderServiceName}:${petProjectVersion}"
+docker tag "${petProjectPetServiceName}" "${containerRegistryName}.azurecr.io/${petProjectPetServiceName}:${petProjectVersionLatest}"
+docker tag "${petProjectPetServiceName}" "${containerRegistryName}.azurecr.io/${petProjectPetServiceName}:${petProjectVersion}"
+docker tag "${petProjectProductServiceName}" "${containerRegistryName}.azurecr.io/${petProjectProductServiceName}:${petProjectVersionLatest}"
+docker tag "${petProjectProductServiceName}" "${containerRegistryName}.azurecr.io/${petProjectProductServiceName}:${petProjectVersion}"
+
+####################################################################################
+############################## docker_push #########################################
+####################################################################################
+docker push "${containerRegistryName}.azurecr.io/${petProjectAppName}:${petProjectVersionLatest}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectAppName}:${petProjectVersion}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectOrderServiceName}:${petProjectVersionLatest}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectOrderServiceName}:${petProjectVersion}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectPetServiceName}:${petProjectVersionLatest}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectPetServiceName}:${petProjectVersion}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectProductServiceName}:${petProjectVersionLatest}"
+docker push "${containerRegistryName}.azurecr.io/${petProjectProductServiceName}:${petProjectVersion}"
+
+az containerapp revision copy --name "${containerAppAppName}" --resource-group "${resourceGroupName}" --container-name "${containerAppName}" --revision-suffix "${revisionV2}" --image "${containerRegistryName}.azurecr.io/${petProjectAppName}:${petProjectVersion}" --set-env-vars ${containerAppWebPortName}=${containerAppWebPortValue} ${containerOrderServiceUrlName}=${containerOrderServiceUrlValue} ${containerPetServiceUrlName}=${containerPetServiceUrlValue} ${containerProductServiceUrlName}=${containerProductServiceUrlValue} --output table
+
+$revisionV1Name="$(az containerapp revision list --name "${containerAppAppName}" --resource-group "${resourceGroupName}" --all --query "[?contains(name,'v1')].{name: name}" --output tsv)"
+$revisionV2Name="$(az containerapp revision list --name "${containerAppAppName}" --resource-group "${resourceGroupName}" --all --query "[?contains(name,'v2')].{name: name}" --output tsv)"
+
+az containerapp ingress traffic set --name "${containerAppAppName}" --resource-group "${resourceGroupName}" --revision-weight ${revisionV1Name}=50 ${revisionV2Name}=50 --output table
