@@ -1,23 +1,21 @@
 name: 'Build and Push Docker Image'
+description: 'Кастомное action для сборки и пуша Docker-образов'
 
 inputs:
   appName:
-    description: 'Name of image'
+    description: 'Имя приложения'
     required: true
   appContexPath:
-    description: 'Context path to source (example . or ./myapp)'
-    required: true
-  tag:
-    description: 'Tag'
+    description: 'Путь к Docker-контексту'
     required: true
   registry:
-    description: 'Registry name'
+    description: 'Регистр Docker'
     required: true
   username:
-    description: 'User name to registry'
+    description: 'Имя пользователя для Docker'
     required: true
   password:
-    description: 'Password to registry'
+    description: 'Пароль для Docker'
     required: true
 
 runs:
@@ -36,9 +34,9 @@ runs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Build and Push Docker image
+    - name: Build and Push Docker Image
       uses: docker/build-push-action@v6
       with:
         context: ${{ inputs.appContexPath }}
         push: true
-        tags: "${{ inputs.registry }}/${{ inputs.appName }}:${{ inputs.tag }}"
+        tags: ${{ inputs.registry }}/${{ inputs.appName }}:latest
