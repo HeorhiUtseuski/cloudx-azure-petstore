@@ -2,6 +2,11 @@ name: Build and Push All
 
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'The branch to build from'
+        required: true
+        default: 'main'
 
 jobs:
   build-and-push-web:
@@ -13,6 +18,11 @@ jobs:
       fail-fast: false
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
       - name: Build image ${{ matrix.appName }}
         uses: ./.github/actions/build-and-push-module
         with:
