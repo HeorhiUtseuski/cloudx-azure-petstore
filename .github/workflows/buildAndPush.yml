@@ -1,4 +1,4 @@
-name: Build and Push <<appName>>
+name: Build and Push All
 
 on:
   workflow_dispatch:
