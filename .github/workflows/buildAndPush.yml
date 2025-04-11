@@ -12,6 +12,9 @@ jobs:
         appName: ['petstoreapp', 'orderitemsreserver', 'petstoreorderservice', 'petstorepetservice', 'petstoreproductservice']
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Build image ${{ matrix.appName }}
         uses: ./.github/actions/build-and-push-module
         with:
