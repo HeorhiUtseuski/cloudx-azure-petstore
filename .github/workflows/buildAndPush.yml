@@ -1,4 +1,4 @@
-name: Build and Push <<appName>>
+name: Build and Push All
 
 on:
   workflow_dispatch:
@@ -10,6 +10,7 @@ jobs:
     strategy:
       matrix:
         appName: ['petstoreapp', 'orderitemsreserver', 'petstoreorderservice', 'petstorepetservice', 'petstoreproductservice']
+      fail-fast: false
 
     steps:
       - name: Build image ${{ matrix.appName }}
