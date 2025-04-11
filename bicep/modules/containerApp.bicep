@@ -2,12 +2,9 @@ param name string
 param applicationName string
 param applicationInsightsConnectionString string
 param containerAppEnvironmentId string
-param envVariables array
+param containerRegistryId string
 param containerRegistryLoginServer string
-@secure()
-param containerRegistryUserName string
-@secure()
-param containerRegistryPassword string
+param envVariables array
 
 param location string = resourceGroup().location
 
@@ -35,17 +32,10 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
   properties: {
     environmentId: containerAppEnvironmentId
     configuration: {
-      secrets: [
-        {
-          name: '${toLower(resourceGroup().name)}${toLower(resourceGroup().location)}${toLower(name)}${toLower(applicationName)}'
-          value: containerRegistryPassword
-        }
-      ]
       registries: [
         {
           server: containerRegistryLoginServer
-          username: containerRegistryUserName
-          passwordSecretRef: '${toLower(resourceGroup().name)}${toLower(resourceGroup().location)}${toLower(name)}${toLower(applicationName)}'
+          identity: 'SystemAssigned'
         }
       ]
       activeRevisionsMode: 'Single'
@@ -90,8 +80,16 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       }
     }
   }
+}
 
-  
+resource acrPullRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(containerApp.name, containerRegistryId, 'acrpull')
+  scope: containerApp
+  properties: {
+    principalId: containerApp.identity.principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d') // AcrPull
+    principalType: 'ServicePrincipal'
+  }
 }
 
 output env array = [

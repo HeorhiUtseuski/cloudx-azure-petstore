@@ -1,10 +1,11 @@
 import * as petLib from 'common.bicep'
 
 param name string
+param logAnalyticsWorkspaceId string
+
 param location string = resourceGroup().location
 param kind string = 'java'
 param kindWorkspace string = 'java'
-param logAnalyticsWorkspaceId string
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: name
@@ -16,5 +17,5 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-output instrumentationKey string = applicationInsights.properties.InstrumentationKey
+//output instrumentationKey string = applicationInsights.properties.InstrumentationKey
 output connectionString string = applicationInsights.properties.ConnectionString

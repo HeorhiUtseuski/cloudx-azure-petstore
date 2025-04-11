@@ -12,10 +12,6 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' =
   properties: {
     adminUserEnabled: true
   }
-  identity: {
-    type: 'SystemAssigned'
-  }
 }
 
-//output registryId string = containerRegistry.id
-output loginServer string = containerRegistry.properties.loginServer
+//output loginServer string = containerRegistry.properties.loginServer

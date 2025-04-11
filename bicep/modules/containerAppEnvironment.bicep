@@ -1,5 +1,4 @@
 param name string
-param location string =resourceGroup().location
 
 @secure()
 param customerId string
@@ -7,6 +6,7 @@ param customerId string
 @secure()
 param sharedKey string
 
+param location string =resourceGroup().location
 
 resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: name

@@ -1,6 +1,7 @@
 import * as petLib from 'common.bicep'
 
 param name string
+param logAnalyticsWorkspaceId string
 
 param location string = resourceGroup().location
 
@@ -36,6 +37,26 @@ resource archiveContainer 'Microsoft.Storage/storageAccounts/blobServices/contai
 
   properties: {
     publicAccess: 'None'
+  }
+}
+
+resource storageDataPlaneLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${name}-logs'
+  scope: blobService
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      {
+        category: 'StorageWrite'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'Transaction'
+        enabled: true
+      }
+    ]
   }
 }
 

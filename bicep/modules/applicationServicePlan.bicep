@@ -13,6 +13,7 @@ resource applicationServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
   }
   properties: {
     reserved: true
+    maximumElasticWorkerCount: 2
   }
 }
 
