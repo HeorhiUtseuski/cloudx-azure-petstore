@@ -48,13 +48,9 @@ module functionApp 'modules/functionApp.bicep' = {
   params: {
     name: petLib.resource.functionAppName
     applicationServicePlanId: applicationServicePlan.outputs.id
-    containerAppEnvironmentId: containerAppEnvironment.outputs.id
-    containerRegistryId: containerRegistry.id
-    containerRegistryLoginServer: containerRegistry.properties.loginServer
     applicationInsightsConnectionString: applicationInsights.outputs.connectionString
     applicationName: 'orderitemsreserver'
-    storageAccountsName: storageAccounts.outputs.name
-    storageAccountsAccessKey: storageAccounts.outputs.accessKey
+    applicationTag: 'v1'
   }
 }
 
@@ -63,9 +59,9 @@ module containerAppPetStoreProductService 'modules/containerApp.bicep' = {
   params: {
     name: petLib.resource.containerAppPetStoreProductServiceName
     applicationName: 'petstoreproductservice'
+    applicationTag: 'v1'
     applicationInsightsConnectionString: applicationInsights.outputs.connectionString
     containerAppEnvironmentId: containerAppEnvironment.outputs.id
-    containerRegistryId: containerRegistry.id
     containerRegistryLoginServer: containerRegistry.properties.loginServer
     envVariables: []
   }
@@ -76,9 +72,9 @@ module containerAppPetStorePetService 'modules/containerApp.bicep' = {
   params: {
     name: petLib.resource.containerAppPetStorePetServiceName
     applicationName: 'petstorepetservice'
+    applicationTag: 'v1'
     applicationInsightsConnectionString: applicationInsights.outputs.connectionString
     containerAppEnvironmentId: containerAppEnvironment.outputs.id
-    containerRegistryId: containerRegistry.id
     containerRegistryLoginServer: containerRegistry.properties.loginServer
     envVariables: []
   }
@@ -89,9 +85,9 @@ module containerAppPetStoreOrderService 'modules/containerApp.bicep' = {
   params: {
     name: petLib.resource.containerAppPetStoreOrderServiceName
     applicationName: 'petstoreorderservice'
+    applicationTag: 'v1'
     applicationInsightsConnectionString: applicationInsights.outputs.connectionString
     containerAppEnvironmentId: containerAppEnvironment.outputs.id
-    containerRegistryId: containerRegistry.id
     containerRegistryLoginServer: containerRegistry.properties.loginServer
     envVariables: union(containerAppPetStoreProductService.outputs.env, functionApp.outputs.env)
   }
@@ -102,9 +98,9 @@ module containerAppPetStoreApp 'modules/containerApp.bicep' = {
   params: {
     name: petLib.resource.containerAppPetStoreAppName
     applicationName: 'petstoreapp'
+    applicationTag: 'v1'
     applicationInsightsConnectionString: applicationInsights.outputs.connectionString
     containerAppEnvironmentId: containerAppEnvironment.outputs.id
-    containerRegistryId: containerRegistry.id
     containerRegistryLoginServer: containerRegistry.properties.loginServer
     envVariables: union(
       containerAppPetStoreProductService.outputs.env, 

@@ -8,7 +8,7 @@ param sharedKey string
 
 param location string =resourceGroup().location
 
-resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
+resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-10-02-preview' = {
   name: name
   location: location
   properties: {
