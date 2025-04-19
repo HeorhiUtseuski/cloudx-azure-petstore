@@ -57,7 +57,7 @@ public class ContainerEnvironment implements Serializable {
 	@Value("${petstore.service.order.url:}")
 	private String petStoreOrderServiceURL;
 
-	@Value("${petstore.service.order.url:}")
+	@Value("${petstore.service.orderitemsreserver.url:}")
 	private String petStoreOrderItemsReserverURL;
 
 	@Value("${petstore.service.subscription.key:}")
