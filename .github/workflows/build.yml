@@ -51,7 +51,7 @@ jobs:
           branch-name: ${{ github.ref_name }}
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
-          azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY }}
+          azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY_NAME }}
           azure-acr-username: ${{ secrets.AZURE_ADMIN_USERNAME }}
           azure-acr-password: ${{ secrets.AZURE_ADMIN_PASSWORD }}
 
@@ -63,7 +63,7 @@ jobs:
           branch-name: ${{ github.ref_name }}
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
-          azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY }}
+          azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY_NAME }}
           azure-acr-username: ${{ secrets.AZURE_ADMIN_USERNAME }}
           azure-acr-password: ${{ secrets.AZURE_ADMIN_PASSWORD }}
 
@@ -75,7 +75,7 @@ jobs:
           branch-name: ${{ github.ref_name }}
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
-          azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY }}
+          azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY_NAME }}
           azure-acr-username: ${{ secrets.AZURE_ADMIN_USERNAME }}
           azure-acr-password: ${{ secrets.AZURE_ADMIN_PASSWORD }}
 
@@ -87,6 +87,6 @@ jobs:
           branch-name: ${{ github.ref_name }}
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
-          azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY }}
+          azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY_NAME }}
           azure-acr-username: ${{ secrets.AZURE_ADMIN_USERNAME }}
           azure-acr-password: ${{ secrets.AZURE_ADMIN_PASSWORD }}
