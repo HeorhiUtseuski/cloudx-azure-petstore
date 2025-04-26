@@ -52,6 +52,7 @@ jobs:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           azure-acr-registry: ${{ vars.AZURE_ACR_REGISTRY }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
+          azure-container-app: ${{ vars.AZURE_CONTAINER_APP }}
 
       - name: Build and Push petstoreorderservice
         if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstoreorderservice == 'true'
@@ -62,6 +63,7 @@ jobs:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           azure-acr-registry: ${{ vars.AZURE_ACR_REGISTRY }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
+          azure-container-app: ${{ vars.AZURE_CONTAINER_APP }}
 
       - name: Build and Push petstorepetservice
         if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstorepetservice == 'true'
@@ -72,6 +74,7 @@ jobs:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           azure-acr-registry: ${{ vars.AZURE_ACR_REGISTRY }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
+          azure-container-app: ${{ vars.AZURE_CONTAINER_APP }}
 
       - name: Build and Push petstoreproductservice
         if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstoreproductservice == 'true'
@@ -82,3 +85,4 @@ jobs:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           azure-acr-registry: ${{ vars.AZURE_ACR_REGISTRY }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
+          azure-container-app: ${{ vars.AZURE_CONTAINER_APP }}

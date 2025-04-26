@@ -16,6 +16,9 @@ inputs:
   azure-resource-group:
     description: 'Name of resource group'
     required: true
+  azure-container-app:
+    description: 'Name of azure-container-app'
+    required: true
 
 
 runs:
@@ -35,5 +38,5 @@ runs:
       with:
         appSourcePath: ${{ github.workspace }}/${{ inputs.module-name }}
         acrName: ${{ inputs.azure-acr-registry }}
-        containerAppName: ${{ inputs.module-name }}
+        containerAppName: ${{ inputs.azure-container-app }}
         resourceGroup: ${{ inputs.azure-resource-group }}
