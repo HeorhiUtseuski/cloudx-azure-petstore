@@ -50,8 +50,10 @@ jobs:
           module-name: petstoreapp
           branch-name: ${{ github.ref_name }}
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          azure-acr-registry: ${{ vars.AZURE_CONTAINER_REGISTRY }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
+          azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY }}
+          azure-acr-username: ${{ secrets.AZURE_ADMIN_USERNAME }}
+          azure-acr-password: ${{ secrets.AZURE_ADMIN_PASSWORD }}
 
       - name: Build and Push petstoreorderservice
         if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstoreorderservice == 'true'
@@ -60,8 +62,10 @@ jobs:
           module-name: petstoreorderservice
           branch-name: ${{ github.ref_name }}
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          azure-acr-registry: ${{ vars.AZURE_CONTAINER_REGISTRY }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
+          azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY }}
+          azure-acr-username: ${{ secrets.AZURE_ADMIN_USERNAME }}
+          azure-acr-password: ${{ secrets.AZURE_ADMIN_PASSWORD }}
 
       - name: Build and Push petstorepetservice
         if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstorepetservice == 'true'
@@ -70,8 +74,10 @@ jobs:
           module-name: petstorepetservice
           branch-name: ${{ github.ref_name }}
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          azure-acr-registry: ${{ vars.AZURE_CONTAINER_REGISTRY }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
+          azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY }}
+          azure-acr-username: ${{ secrets.AZURE_ADMIN_USERNAME }}
+          azure-acr-password: ${{ secrets.AZURE_ADMIN_PASSWORD }}
 
       - name: Build and Push petstoreproductservice
         if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstoreproductservice == 'true'
@@ -80,5 +86,7 @@ jobs:
           module-name: petstoreproductservice
           branch-name: ${{ github.ref_name }}
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          azure-acr-registry: ${{ vars.AZURE_CONTAINER_REGISTRY }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
+          azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY }}
+          azure-acr-username: ${{ secrets.AZURE_ADMIN_USERNAME }}
+          azure-acr-password: ${{ secrets.AZURE_ADMIN_PASSWORD }}

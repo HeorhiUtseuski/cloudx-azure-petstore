@@ -10,11 +10,15 @@ inputs:
   azure-credentials:
     description: 'Credentials for authentification on Azure'
     required: true
-  azure-acr-registry:
+  azure-acr-registry-name:
     description: 'Name of ACR'
     required: true
   azure-resource-group:
     description: 'Name of resource group'
+    required: true
+  azure-acr-username:
+    required: true
+  azure-acr-password:
     required: true
 
 runs:
@@ -33,6 +37,8 @@ runs:
       uses: azure/container-apps-deploy-action@v2
       with:
         appSourcePath: ${{ github.workspace }}/${{ inputs.module-name }}
-        acrName: ${{ inputs.azure-acr-registry }}
+        acrName: ${{ inputs.azure-acr-registry-name }}
         containerAppName: 'plan-${{ inputs.module-name }}'
         resourceGroup: ${{ inputs.azure-resource-group }}
+        acrUsername: ${{ inputs.azure-acr-username }}
+        acrPassword: ${{ inputs.azure-acr-password }}

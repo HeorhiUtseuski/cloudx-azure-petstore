@@ -17,7 +17,7 @@ variable "sku" {
 
 variable "admin_enabled" {
   type = bool
-  default = false
+  default = true
 }
 
 variable "key_vault_id" {
