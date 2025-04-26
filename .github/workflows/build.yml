@@ -6,10 +6,14 @@ on:
       - '**'
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'Branch to build from'
-        required: true
-        type: string
+      force_build:
+        description: 'Force build all modules regardless of changes'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 jobs:
   detect-and-build:
@@ -17,13 +21,13 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SELECTED_BRANCH: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref_name }}
+      FORCE_BUILD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.force_build || 'false' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.SELECTED_BRANCH }}
+          ref: ${{ github.ref_name }}
 
       - name: Detect changed modules
         id: changes
@@ -40,29 +44,29 @@ jobs:
               - 'petstoreproductservice/**'
 
       - name: Build and Push petstoreapp
-        if: steps.changes.outputs.petstoreapp == 'true'
+        if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstoreapp == 'true'
         uses: ./.github/actions/build-and-push-module
         with:
           module-name: petstoreapp
-          branch-name: ${{ env.SELECTED_BRANCH }}
+          branch-name: ${{ github.ref_name }}
 
       - name: Build and Push petstoreorderservice
-        if: steps.changes.outputs.petstoreorderservice == 'true'
+        if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstoreorderservice == 'true'
         uses: ./.github/actions/build-and-push-module
         with:
           module-name: petstoreorderservice
-          branch-name: ${{ env.SELECTED_BRANCH }}
+          branch-name: ${{ github.ref_name }}
 
       - name: Build and Push petstorepetservice
-        if: steps.changes.outputs.petstorepetservice == 'true'
+        if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstorepetservice == 'true'
         uses: ./.github/actions/build-and-push-module
         with:
           module-name: petstorepetservice
-          branch-name: ${{ env.SELECTED_BRANCH }}
+          branch-name: ${{ github.ref_name }}
 
       - name: Build and Push petstoreproductservice
-        if: steps.changes.outputs.petstoreproductservice == 'true'
+        if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstoreproductservice == 'true'
         uses: ./.github/actions/build-and-push-module
         with:
           module-name: petstoreproductservice
-          branch-name: ${{ env.SELECTED_BRANCH }}
+          branch-name: ${{ github.ref_name }}
