@@ -1,44 +1,30 @@
-name: 'Build and Push Docker Image'
+name: 'Build, Push and Deploy Docker Image'
 
 inputs:
-  appName:
-    description: 'Name of image'
+  module-name:
+    description: 'Name of the Docker image'
     required: true
-  appContexPath:
-    description: 'Context path to source (example . or ./myapp)'
+  branch-name:
+    description: 'Name of branch to build'
     required: true
-  tag:
-    description: 'Tag'
-    required: true
-  registry:
-    description: 'Registry name'
-    required: true
-  username:
-    description: 'User name to registry'
-    required: true
-  password:
-    description: 'Password to registry'
-    required: true
+
 
 runs:
-  using: 'composite'
+  using: composite
   steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Docker Login
-      uses: docker/login-action@v3
+    - uses: actions/checkout@v4
       with:
-        registry: ${{ inputs.registry }}
-        username: ${{ inputs.username }}
-        password: ${{ inputs.password }}
+        ref: ${{ inputs.branch-name }}
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Build and Push Docker image
-      uses: docker/build-push-action@v6
+    - name: Log in to Azure
+      uses: azure/login@v2
       with:
-        context: ${{ inputs.appContexPath }}
-        push: true
-        tags: "${{ inputs.registry }}/${{ inputs.appName }}:${{ inputs.tag }}"
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Build and deploy Container App
+      uses: azure/container-apps-deploy-action@v2
+      with:
+        appSourcePath: ${{ github.workspace }}/${{ inputs.module-name }}
+        acrName: ${{ vars.AZURE_ACR_REGISTRY }}
+        containerAppName: ${{ inputs.module-name }}
+        resourceGroup: ${{ vars.AZURE_RESOURCE_GROUP }}

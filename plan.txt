@@ -1,0 +1,9 @@
+az extension add --name containerapp --upgrade
+az provider register --namespace Microsoft.App
+az provider register --namespace Microsoft.OperationalInsights
+az provider register --namespace Microsoft.AzureTerraform
+
+az ad sp create-for-rbac \
+    --display-name "heorhi_utseuski_github_actions" \
+    --role "contributor" \
+    --scope /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.ContainerRegistry/registries/<acr-name>

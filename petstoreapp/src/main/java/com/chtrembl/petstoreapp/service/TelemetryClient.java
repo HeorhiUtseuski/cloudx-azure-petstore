@@ -7,7 +7,6 @@ import com.microsoft.applicationinsights.telemetry.MetricTelemetry;
 import com.microsoft.applicationinsights.telemetry.PageViewTelemetry;
 import com.microsoft.applicationinsights.telemetry.RemoteDependencyTelemetry;
 import com.microsoft.applicationinsights.telemetry.RequestTelemetry;
-import com.microsoft.applicationinsights.telemetry.SessionState;
 import com.microsoft.applicationinsights.telemetry.SeverityLevel;
 import com.microsoft.applicationinsights.telemetry.Telemetry;
 import com.microsoft.applicationinsights.telemetry.TraceTelemetry;
@@ -80,12 +79,6 @@ public class TelemetryClient extends com.microsoft.applicationinsights.Telemetry
 	}
 
 	@Override
-	public void trackMetric(String name, double value, int sampleCount, double min, double max,
-			Map<String, String> properties) {
-		logger.warn(message);
-	}
-
-	@Override
 	public void trackMetric(String name, double value, Integer sampleCount, Double min, Double max, Double stdDev,
 			Map<String, String> properties) {
 		logger.warn(message);
@@ -108,11 +101,6 @@ public class TelemetryClient extends com.microsoft.applicationinsights.Telemetry
 
 	@Override
 	public void trackRequest(RequestTelemetry request) {
-		logger.warn(message);
-	}
-
-	@Override
-	public void trackSessionState(SessionState sessionState) {
 		logger.warn(message);
 	}
 
