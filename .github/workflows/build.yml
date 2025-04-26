@@ -49,6 +49,9 @@ jobs:
         with:
           module-name: petstoreapp
           branch-name: ${{ github.ref_name }}
+          azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          azure-acr-registry: ${{ vars.AZURE_ACR_REGISTRY }}
+          azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
 
       - name: Build and Push petstoreorderservice
         if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstoreorderservice == 'true'
@@ -56,6 +59,9 @@ jobs:
         with:
           module-name: petstoreorderservice
           branch-name: ${{ github.ref_name }}
+          azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          azure-acr-registry: ${{ vars.AZURE_ACR_REGISTRY }}
+          azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
 
       - name: Build and Push petstorepetservice
         if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstorepetservice == 'true'
@@ -63,6 +69,9 @@ jobs:
         with:
           module-name: petstorepetservice
           branch-name: ${{ github.ref_name }}
+          azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          azure-acr-registry: ${{ vars.AZURE_ACR_REGISTRY }}
+          azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
 
       - name: Build and Push petstoreproductservice
         if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstoreproductservice == 'true'
@@ -70,3 +79,6 @@ jobs:
         with:
           module-name: petstoreproductservice
           branch-name: ${{ github.ref_name }}
+          azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          azure-acr-registry: ${{ vars.AZURE_ACR_REGISTRY }}
+          azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
