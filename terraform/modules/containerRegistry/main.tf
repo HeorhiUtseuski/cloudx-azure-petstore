@@ -16,15 +16,3 @@ resource "azurerm_role_assignment" "acr_pull" {
   role_definition_name = "AcrPull"
   principal_id         = var.user_assigned_principal_id
 }
-
-resource "azurerm_key_vault_secret" "containerRegistryAdminUsernameSecret" {
-  name         = "${var.name}-admin-username"
-  value        = azurerm_container_registry.containerRegistry.admin_username
-  key_vault_id = var.key_vault_id
-}
-
-resource "azurerm_key_vault_secret" "containerRegistryAdminPasswordSecret" {
-  name         = "${var.name}-admin-password"
-  value        = azurerm_container_registry.containerRegistry.admin_password
-  key_vault_id = var.key_vault_id
-}

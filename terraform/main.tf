@@ -94,14 +94,12 @@ module "containerRegistry" {
   location            = module.resourceGroup.location
   resource_group_name = module.resourceGroup.name
 
-  key_vault_id               = module.keyVault.id
   user_assigned_id           = module.userAssignedIdentity.id
   user_assigned_principal_id = module.userAssignedIdentity.principal_id
 
   depends_on = [
     module.naming,
     module.resourceGroup,
-    module.keyVault,
     module.userAssignedIdentity
   ]
 }
@@ -138,25 +136,6 @@ module "cosmosdb" {
   ]
 }
 
-# module "dockerImage" {
-#   source = "./modules/dockerImage"
-#
-#   for_each = merge(local.list_web_services, local.list_web_app)
-#
-#   name                            = each.value
-#   container_registry_name         = module.containerRegistry.name
-#   container_registry_login_server = module.containerRegistry.login_server
-#   context_path                    = "../${each.value}"
-#   key_vault_id                    = module.keyVault.id
-#   admin_username_secret_name      = module.containerRegistry.admin_username_secret_name
-#   admin_password_secret_name      = module.containerRegistry.admin_password_secret_name
-#
-#   depends_on = [
-#     module.containerRegistry,
-#     module.keyVault,
-#   ]
-# }
-
 module "containerAppPetStoreApp" {
   source = "./modules/containerApp"
 
@@ -182,7 +161,6 @@ module "containerAppPetStoreApp" {
     module.containerRegistry,
     module.keyVault,
     module.userAssignedIdentity,
-    # module.dockerImage["petstoreapp"],
     module.containerAppPetStoreOrderService,
     module.containerAppPetstorePetService,
     module.containerAppPetStoreProductService
@@ -213,7 +191,6 @@ module "containerAppPetStoreOrderService" {
     module.containerRegistry,
     module.keyVault,
     module.userAssignedIdentity,
-    # module.dockerImage["petstoreorderservice"],
     module.containerAppPetStoreProductService
   ]
 }
@@ -239,7 +216,6 @@ module "containerAppPetstorePetService" {
     module.containerRegistry,
     module.keyVault,
     module.userAssignedIdentity,
-    # module.dockerImage["petstorepetservice"]
   ]
 }
 
@@ -264,6 +240,5 @@ module "containerAppPetStoreProductService" {
     module.containerRegistry,
     module.keyVault,
     module.userAssignedIdentity,
-    # module.dockerImage["petstoreproductservice"]
   ]
 }

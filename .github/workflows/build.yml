@@ -52,8 +52,6 @@ jobs:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
           azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY_NAME }}
-          azure-acr-username: ${{ secrets.AZURE_ADMIN_USERNAME }}
-          azure-acr-password: ${{ secrets.AZURE_ADMIN_PASSWORD }}
 
       - name: Build and Push petstoreorderservice
         if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstoreorderservice == 'true'
@@ -64,8 +62,6 @@ jobs:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
           azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY_NAME }}
-          azure-acr-username: ${{ secrets.AZURE_ADMIN_USERNAME }}
-          azure-acr-password: ${{ secrets.AZURE_ADMIN_PASSWORD }}
 
       - name: Build and Push petstorepetservice
         if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstorepetservice == 'true'
@@ -76,8 +72,6 @@ jobs:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
           azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY_NAME }}
-          azure-acr-username: ${{ secrets.AZURE_ADMIN_USERNAME }}
-          azure-acr-password: ${{ secrets.AZURE_ADMIN_PASSWORD }}
 
       - name: Build and Push petstoreproductservice
         if: env.FORCE_BUILD == 'true' || steps.changes.outputs.petstoreproductservice == 'true'
@@ -88,5 +82,3 @@ jobs:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           azure-resource-group: ${{ vars.AZURE_RESOURCE_GROUP }}
           azure-acr-registry-name: ${{ vars.AZURE_ACR_REGISTRY_NAME }}
-          azure-acr-username: ${{ secrets.AZURE_ADMIN_USERNAME }}
-          azure-acr-password: ${{ secrets.AZURE_ADMIN_PASSWORD }}
