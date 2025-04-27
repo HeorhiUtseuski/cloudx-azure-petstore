@@ -40,5 +40,11 @@ runs:
         acrName: ${{ inputs.azure-acr-registry-name }}
         containerAppName: 'plan-${{ inputs.module-name }}'
         resourceGroup: ${{ inputs.azure-resource-group }}
-        acrUsername: ${{ inputs.azure-acr-username }}
-        acrPassword: ${{ inputs.azure-acr-password }}
+        imageToBuild: '${{ inputs.azure-acr-registry-name }}.azurecr.io/plan-${{ inputs.module-name }}:latest'
+
+#        appSourcePath: ${{ github.workspace }}/${{ inputs.module-name }}
+#        acrName: ${{ inputs.azure-acr-registry-name }}
+#        containerAppName: 'plan-${{ inputs.module-name }}'
+#        resourceGroup: ${{ inputs.azure-resource-group }}
+#        acrUsername: ${{ inputs.azure-acr-username }}
+#        acrPassword: ${{ inputs.azure-acr-password }}
