@@ -4,6 +4,20 @@ az provider register --namespace Microsoft.OperationalInsights
 az provider register --namespace Microsoft.AzureTerraform
 
 az ad sp create-for-rbac \
-    --display-name "heorhi_utseuski_github_actions" \
-    --role "contributor" \
-    --scope /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.ContainerRegistry/registries/<acr-name>
+  --name "heorhi_utseuski_github_actions" \
+  --role "AcrPull" \
+  --scope /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.ContainerRegistry/registries/<acr-name>
+
+{
+  "clientId": "<appId>",
+  "subscriptionId": "<subscriptionId>",
+  "clientSecret": "<password>",
+  "tenantId": "<tenant>"
+}
+
+az role assignment create \
+  --assignee <appId-of-service-principal> \
+  --role "Contributor" \
+  --scope /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>
+
+az ad sp show --id <client-id> --only-show-errors --query "{clientId: appId, clientSecret: password, subscriptionId: subscriptionId, tenantId: tenant}" --output json

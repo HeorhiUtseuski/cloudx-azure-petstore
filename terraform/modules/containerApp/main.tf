@@ -45,7 +45,8 @@ resource "azurerm_container_app" "containerApp" {
   template {
     container {
       name   = var.name
-      image  = "${var.container_registry_login_server}/${var.application_name}:${var.application_tag}"
+      # image  = "${var.container_registry_login_server}/${var.application_name}:${var.application_tag}"
+      image  = "mcr.microsoft.com/azurelinux/base/nginx:1"
       cpu    = "0.25"
       memory = "0.5Gi"
 

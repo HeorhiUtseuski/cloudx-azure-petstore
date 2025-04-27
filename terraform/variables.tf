@@ -5,8 +5,3 @@ variable "subscription_id" {
 variable "tenant_id" {
   type = string
 }
-
-variable "image_tag" {
-  type    = string
-  default = "latest"
-}

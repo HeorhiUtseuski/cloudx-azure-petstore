@@ -22,10 +22,6 @@ variable "application_name" {
   type = string
 }
 
-variable "application_tag" {
-  type = string
-}
-
 variable "enviroment_variables" {
   type = map(string)
   default = {}

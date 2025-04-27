@@ -138,24 +138,24 @@ module "cosmosdb" {
   ]
 }
 
-module "dockerImage" {
-  source = "./modules/dockerImage"
-
-  for_each = merge(local.list_web_services, local.list_web_app)
-
-  name                            = each.value
-  container_registry_name         = module.containerRegistry.name
-  container_registry_login_server = module.containerRegistry.login_server
-  context_path                    = "../${each.value}"
-  key_vault_id                    = module.keyVault.id
-  admin_username_secret_name      = module.containerRegistry.admin_username_secret_name
-  admin_password_secret_name      = module.containerRegistry.admin_password_secret_name
-
-  depends_on = [
-    module.containerRegistry,
-    module.keyVault,
-  ]
-}
+# module "dockerImage" {
+#   source = "./modules/dockerImage"
+#
+#   for_each = merge(local.list_web_services, local.list_web_app)
+#
+#   name                            = each.value
+#   container_registry_name         = module.containerRegistry.name
+#   container_registry_login_server = module.containerRegistry.login_server
+#   context_path                    = "../${each.value}"
+#   key_vault_id                    = module.keyVault.id
+#   admin_username_secret_name      = module.containerRegistry.admin_username_secret_name
+#   admin_password_secret_name      = module.containerRegistry.admin_password_secret_name
+#
+#   depends_on = [
+#     module.containerRegistry,
+#     module.keyVault,
+#   ]
+# }
 
 module "containerAppPetStoreApp" {
   source = "./modules/containerApp"
@@ -163,7 +163,6 @@ module "containerAppPetStoreApp" {
   name                                        = "${module.naming.app_service_plan.slug}-${local.list_web_app["petstoreapp"]}"
   resource_group_name                         = module.resourceGroup.name
   application_name                            = local.list_web_app["petstoreapp"]
-  application_tag                             = var.image_tag
   container_app_environment_id                = module.containerAppEnvironment.id
   container_registry_login_server             = module.containerRegistry.login_server
   key_vault_id                                = module.keyVault.id
@@ -183,7 +182,7 @@ module "containerAppPetStoreApp" {
     module.containerRegistry,
     module.keyVault,
     module.userAssignedIdentity,
-    module.dockerImage["petstoreapp"],
+    # module.dockerImage["petstoreapp"],
     module.containerAppPetStoreOrderService,
     module.containerAppPetstorePetService,
     module.containerAppPetStoreProductService
@@ -196,7 +195,6 @@ module "containerAppPetStoreOrderService" {
   name                                        = "${module.naming.app_service_plan.slug}-${local.list_web_services["petstoreorderservice"]}"
   resource_group_name                         = module.resourceGroup.name
   application_name                            = local.list_web_services["petstoreorderservice"]
-  application_tag                             = var.image_tag
   container_app_environment_id                = module.containerAppEnvironment.id
   container_registry_login_server             = module.containerRegistry.login_server
   key_vault_id                                = module.keyVault.id
@@ -215,7 +213,7 @@ module "containerAppPetStoreOrderService" {
     module.containerRegistry,
     module.keyVault,
     module.userAssignedIdentity,
-    module.dockerImage["petstoreorderservice"],
+    # module.dockerImage["petstoreorderservice"],
     module.containerAppPetStoreProductService
   ]
 }
@@ -226,7 +224,6 @@ module "containerAppPetstorePetService" {
   name                                        = "${module.naming.app_service_plan.slug}-${local.list_web_services["petstorepetservice"]}"
   resource_group_name                         = module.resourceGroup.name
   application_name                            = local.list_web_services["petstorepetservice"]
-  application_tag                             = var.image_tag
   container_app_environment_id                = module.containerAppEnvironment.id
   container_registry_login_server             = module.containerRegistry.login_server
   key_vault_id                                = module.keyVault.id
@@ -242,7 +239,7 @@ module "containerAppPetstorePetService" {
     module.containerRegistry,
     module.keyVault,
     module.userAssignedIdentity,
-    module.dockerImage["petstorepetservice"]
+    # module.dockerImage["petstorepetservice"]
   ]
 }
 
@@ -252,7 +249,6 @@ module "containerAppPetStoreProductService" {
   name                                        = "${module.naming.app_service_plan.slug}-${local.list_web_services["petstoreproductservice"]}"
   resource_group_name                         = module.resourceGroup.name
   application_name                            = local.list_web_services["petstoreproductservice"]
-  application_tag                             = var.image_tag
   container_app_environment_id                = module.containerAppEnvironment.id
   container_registry_login_server             = module.containerRegistry.login_server
   key_vault_id                                = module.keyVault.id
@@ -268,6 +264,6 @@ module "containerAppPetStoreProductService" {
     module.containerRegistry,
     module.keyVault,
     module.userAssignedIdentity,
-    module.dockerImage["petstoreproductservice"]
+    # module.dockerImage["petstoreproductservice"]
   ]
 }
