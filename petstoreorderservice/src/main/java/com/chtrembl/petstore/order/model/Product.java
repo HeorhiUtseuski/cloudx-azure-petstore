@@ -5,8 +5,6 @@ import java.util.Objects;
 
 import javax.validation.constraints.NotNull;
 
-import com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document;
-import org.springframework.data.annotation.Id;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,9 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
 @SuppressWarnings("serial")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-12-23T15:16:30.446-05:00")
-@Document(collection = "products")
 public class Product implements Serializable {
-	@Id
 	@JsonProperty("id")
 	private Long id = null;
 

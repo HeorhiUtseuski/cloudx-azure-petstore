@@ -3,8 +3,6 @@ package com.chtrembl.petstore.order.api;
 import com.chtrembl.petstore.order.model.ContainerEnvironment;
 import com.chtrembl.petstore.order.model.Order;
 import com.chtrembl.petstore.order.model.Product;
-import com.chtrembl.petstore.order.repository.OrderRepository;
-import com.chtrembl.petstore.order.repository.ProductRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
@@ -27,10 +25,8 @@ import javax.validation.constraints.Min;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2021-12-21T10:17:19.885-05:00")
 
@@ -52,10 +48,12 @@ public class StoreApiController implements StoreApi {
 	private ContainerEnvironment containerEnvironment;
 
 	@Autowired
-	private OrderRepository orderRepository;
+	private StoreApiCache storeApiCache;
 
-	@Autowired
-	private ProductRepository productRepository;
+	@Override
+	public StoreApiCache getBeanToBeAutowired() {
+		return storeApiCache;
+	}
 
 	@org.springframework.beans.factory.annotation.Autowired
 	public StoreApiController(ObjectMapper objectMapper, NativeWebRequest request) {
@@ -116,42 +114,58 @@ public class StoreApiController implements StoreApi {
 					"PetStoreOrderService incoming POST request to petstoreorderservice/v2/order/placeOder for order id:%s",
 					body.getId()));
 
-			Order placedOrder = orderRepository.findById(body.getId()).orElse(new Order());
+			Order order = this.storeApiCache.getOrder(body.getId());
 
-			placedOrder.setId(body.getId());
-			placedOrder.setEmail(body.getEmail());
-			placedOrder.setComplete(body.isComplete());
-			List<Product> existingProducts = placedOrder.getProducts();
-			if (existingProducts == null) {
-				existingProducts = new ArrayList<>();
-			}
+			order.setId(body.getId());
+			order.setEmail(body.getEmail());
+			order.setComplete(body.isComplete());
 
+			// 1 product is just an add from a product page so cache needs to be updated
 			if (body.getProducts() != null && body.getProducts().size() == 1) {
 				Product incomingProduct = body.getProducts().get(0);
-				if (incomingProduct.getQuantity() == 0) {
-					existingProducts.removeIf(product -> product.getId().equals(incomingProduct.getId()));
+				List<Product> existingProducts = order.getProducts();
+				if (existingProducts != null && existingProducts.size() > 0) {
+					// removal if one exists...
+					if (incomingProduct.getQuantity() == 0) {
+						existingProducts.removeIf(product -> product.getId().equals(incomingProduct.getId()));
+						order.setProducts(existingProducts);
+					}
+					// update quantity if one exists or add new entry
+					else {
+
+						Product product = existingProducts.stream()
+								.filter(existingProduct -> existingProduct.getId().equals(incomingProduct.getId()))
+								.findAny().orElse(null);
+						if (product != null) {
+							// one exists
+							int qty = product.getQuantity() + incomingProduct.getQuantity();
+							// if the count falls below 1, remove it
+							if (qty < 1) {
+								existingProducts.removeIf(p -> p.getId().equals(incomingProduct.getId()));
+							} else if (qty < 11) {
+								product.setQuantity(qty);
+							}
+						} else {
+							// existing products but one does not exist matching the incoming product
+							order.addProductsItem(body.getProducts().get(0));
+						}
+					}
 				} else {
-					existingProducts = existingProducts.stream()
-							.peek(product -> {
-								if (product.getId().equals(incomingProduct.getId())) {
-									product.setQuantity(product.getQuantity() + incomingProduct.getQuantity());
-								}
-							})
-							.filter(product -> product.getQuantity() > 0)
-							.peek(product -> {
-								if (product.getQuantity() > 10) {
-									product.setQuantity(10);
-								}
-							})
-							.collect(Collectors.toList());
+					// nothing existing....
+					if (body.getProducts().get(0).getQuantity() > 0) {
+						order.setProducts(body.getProducts());
+					}
 				}
 			}
-
-			placedOrder.setProducts(existingProducts);
-			orderRepository.save(placedOrder);
+			// n products is the current order being modified and so cache can be replaced
+			// with it
+			if (body.getProducts() != null && body.getProducts().size() > 1) {
+				order.setProducts(body.getProducts());
+			}
 
 			try {
-				String orderJSON = new ObjectMapper().writeValueAsString(placedOrder);
+				this.storeApiCache.saveOrder(order);
+				String orderJSON = new ObjectMapper().writeValueAsString(order);
 
 				ApiUtil.setResponse(request, "application/json", orderJSON);
 				return new ResponseEntity<>(HttpStatus.OK);
@@ -162,6 +176,7 @@ public class StoreApiController implements StoreApi {
 		}
 
 		return new ResponseEntity<Order>(HttpStatus.NOT_IMPLEMENTED);
+
 	}
 
 	@Override
@@ -178,9 +193,9 @@ public class StoreApiController implements StoreApi {
 					"PetStoreOrderService incoming GET request to petstoreorderservice/v2/order/getOrderById for order id:%s",
 					orderId));
 
-			List<Product> products = productRepository.findAll();
+			List<Product> products = this.storeApiCache.getProducts();
 
-			Order order = orderRepository.findById(orderId).orElse(new Order());
+			Order order = this.storeApiCache.getOrder(orderId);
 
 			if (products != null) {
 				// cross reference order data (order only has product id and qty) with product
@@ -201,6 +216,7 @@ public class StoreApiController implements StoreApi {
 			}
 
 			try {
+				storeApiCache.saveOrder(order);
 				ApiUtil.setResponse(request, "application/json", new ObjectMapper().writeValueAsString(order));
 				return new ResponseEntity<>(HttpStatus.OK);
 			} catch (IOException e) {
@@ -221,8 +237,7 @@ public class StoreApiController implements StoreApi {
 	@Override
 	public ResponseEntity<Void> deleteOrder(
 			@Min(1L) @ApiParam(value = "ID of the order that needs to be deleted", required = true) @PathVariable("orderId") String orderId) {
-
-		orderRepository.deleteById(orderId);
+		storeApiCache.deleteOrder(orderId);
 		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 	}
 

@@ -24,6 +24,7 @@ azure:
     key: ${AZURE_COSMOS_KEY}
     database: ${AZURE_COSMOS_DATABASE}
 
+
 management:
   endpoints:
     web:
@@ -35,3 +36,4 @@ management:
   endpoint:
     httptrace:
       enabled: true
+

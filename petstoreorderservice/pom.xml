@@ -102,11 +102,11 @@
             <version>${jaxb.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.microsoft.azure</groupId>
-            <artifactId>spring-data-cosmosdb</artifactId>
-            <version>2.3.1</version>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-spring-data-cosmos</artifactId>
+            <version>3.45.0</version>
         </dependency>
-<!--        <dependency>-->
+        <!--        <dependency>-->
 <!--            <groupId>com.azure</groupId>-->
 <!--            <artifactId>azure-cosmos</artifactId>-->
 <!--            <version>${azure.cosmos.version}</version>-->
