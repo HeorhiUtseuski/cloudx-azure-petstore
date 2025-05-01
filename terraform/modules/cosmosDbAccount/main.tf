@@ -40,3 +40,12 @@ resource "azurerm_cosmosdb_sql_container" "orders" {
 
   partition_key_paths = ["/orderId"]
 }
+
+resource "azurerm_cosmosdb_sql_container" "products" {
+  name                = "products"
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.cosmosdb.name
+  database_name       = azurerm_cosmosdb_sql_database.petstoredb.name
+
+  partition_key_paths = ["/productId"]
+}

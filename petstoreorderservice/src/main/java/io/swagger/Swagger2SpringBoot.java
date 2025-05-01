@@ -1,6 +1,7 @@
 package io.swagger;
 
 import com.chtrembl.petstore.order.model.ContainerEnvironment;
+import com.microsoft.azure.spring.data.cosmosdb.repository.config.EnableCosmosRepositories;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -18,7 +19,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication
 @EnableCaching
 @EnableSwagger2
-@ComponentScan(basePackages = { "io.swagger", "com.chtrembl.petstore.order.api", "io.swagger.configuration" })
+@ComponentScan(basePackages = { "io.swagger", "com.chtrembl.petstore.order", "io.swagger.configuration" })
+@EnableCosmosRepositories
 public class Swagger2SpringBoot implements CommandLineRunner {
 	static final Logger log = LoggerFactory.getLogger(Swagger2SpringBoot.class);
 

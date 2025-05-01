@@ -4,10 +4,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">=4.26.0"
     }
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = ">= 3.2.0"
-    }
   }
 
   required_version = ">= 1.5.0"
@@ -26,8 +22,4 @@ provider "azurerm" {
 
   subscription_id = var.subscription_id
   tenant_id       = var.tenant_id
-}
-
-provider "docker" {
-  host = "unix:///var/run/docker.sock"
 }
